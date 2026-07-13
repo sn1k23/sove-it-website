@@ -59,13 +59,13 @@
   <h1>Mundlak-Zerlegung: Within- und Between-Effekt sauber trennen</h1>
   <div class="meta">13. Juli 2026 · ~7 Min · Nico Schäfer</div>
 
-  <p class="lead">Wer Paneldaten mit einem simplen Random-Effects-Modell auswertet, mischt zwei Fragen, die nichts miteinander zu tun haben: „Was passiert, wenn <em>eine</em> Einheit sich über die Zeit verändert?" und „Wie unterscheiden sich <em>verschiedene</em> Einheiten?". Der Mundlak-Trick trennt beides — mit einer einzigen zusätzlichen Variable und ohne den Effizienzverlust eines reinen Fixed-Effects-Modells.</p>
+  <p class="lead">Ein einfaches Random-Effects-Modell vermengt bei Paneldaten zwei analytisch zu trennende Fragestellungen: die Veränderung <em>innerhalb</em> einer Einheit über die Zeit einerseits, die Unterschiede <em>zwischen</em> den Einheiten andererseits. Die Mundlak-Korrektur trennt beide Varianzquellen — mit einer einzigen zusätzlichen Kovariate und ohne den Effizienzverlust eines reinen Fixed-Effects-Ansatzes.</p>
 
   <h2>Das Problem an einem Beispiel</h2>
-  <p>Angenommen, wir modellieren Streckenstörungen im Schienenverkehr als Funktion der Instandhaltungsintensität. Über mehrere Jahre je Streckenabschnitt (<code>strecke_id</code> × <code>jahr</code>) stellt sich die Frage: Senkt <em>mehr Instandhaltung</em> die Störungen? Ein naives Random-Effects-Modell gibt einen Koeffizienten zurück, der Within- und Between-Variation vermischt — und genau dann verzerrt ist, wenn stärker beanspruchte Strecken sowohl mehr gewartet werden <em>als auch</em> mehr stören. Selektion, als Effekt getarnt.</p>
+  <p>Modelliert sei die Häufigkeit von Streckenstörungen im Schienenverkehr als Funktion der Instandhaltungsintensität, beobachtet über mehrere Jahre je Streckenabschnitt (<code>strecke_id</code> × <code>jahr</code>). Zu klären ist, ob eine höhere Instandhaltungsintensität die Störungen senkt. Ein naives Random-Effects-Modell liefert hier einen Koeffizienten, der Within- und Between-Variation vermischt. Verzerrt ist dieser Schätzer immer dann, wenn stärker beanspruchte Strecken zugleich intensiver gewartet werden <em>und</em> häufiger stören: Die Selektion schlägt sich dann als vermeintlicher Effekt nieder.</p>
 
-  <h2>Die Mundlak-Idee in einem Satz</h2>
-  <p>Nimm zusätzlich den <strong>Einheiten-Mittelwert</strong> jeder zeitveränderlichen Kovariate ins Modell auf. Der ursprüngliche Koeffizient misst dann den reinen <strong>Within-Effekt</strong> (Veränderung innerhalb einer Strecke), der Koeffizient des Mittelwerts die <strong>Between-Korrektur</strong>. Ist letzterer signifikant, war das naive RE-Modell verzerrt — das ist zugleich ein handlicher Hausman-Test.</p>
+  <h2>Das Verfahren in einem Satz</h2>
+  <p>In das Modell wird zusätzlich der <strong>Einheiten-Mittelwert</strong> jeder zeitveränderlichen Kovariate aufgenommen. Der ursprüngliche Koeffizient misst dann den reinen <strong>Within-Effekt</strong> — die Veränderung innerhalb einer Strecke —, der Koeffizient des Mittelwerts die <strong>Between-Korrektur</strong>. Fällt letzterer signifikant aus, war das naive RE-Modell verzerrt; insofern liefert die Zerlegung zugleich einen handlichen Hausman-Test.</p>
 
   <div class="filelabel">mundlak.R</div>
 <pre><span class="cmt"># Einheiten-Mittelwert der zeitveränderlichen Kovariate</span>
@@ -81,7 +81,7 @@ m &lt;- <span class="fn">plm</span>(stoerungen ~ instandhaltung + instand_bar,
 <span class="fn">library</span>(lmtest)
 <span class="fn">coeftest</span>(m)   <span class="cmt"># instand_bar signifikant  =&gt;  RE war verzerrt</span></pre>
 
-  <p>Der Koeffizient auf <code>instandhaltung</code> ist jetzt der Within-Effekt — numerisch identisch zum Fixed-Effects-Schätzer, aber im RE-Rahmen, sodass zeitkonstante Merkmale (Streckentyp, Region) weiter im Modell bleiben dürfen. Der Koeffizient auf <code>instand_bar</code> fängt exakt die Selektion ab, die den naiven Schätzer verzerrt hätte.</p>
+  <p>Der Koeffizient auf <code>instandhaltung</code> entspricht nun dem Within-Effekt und ist numerisch identisch mit dem Fixed-Effects-Schätzer, verbleibt jedoch im RE-Rahmen, sodass zeitkonstante Merkmale wie Streckentyp oder Region im Modell erhalten bleiben. Der Koeffizient auf <code>instand_bar</code> bindet exakt jene Selektion, die den naiven Schätzer verzerrt hätte.</p>
 
   <figure>
   <svg viewBox="0 0 700 300" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;background:#191919;border:1px solid #2a2a2a;border-radius:8px">
@@ -101,8 +101,8 @@ m &lt;- <span class="fn">plm</span>(stoerungen ~ instandhaltung + instand_bar,
   <figcaption>Between-Signal (grau) zeigt fälschlich einen positiven Zusammenhang — nur die Within-Zerlegung (grün) misst die Wirkung der Instandhaltung.</figcaption>
   </figure>
 
-  <h2>Der ehrliche Zusatz: Störungen sind Zähldaten</h2>
-  <p>Das lineare Modell oben erklärt die Mechanik am saubersten. Streckenstörungen sind aber Counts, oft überstreut — methodisch gehört die Mundlak-Korrektur hier in ein (Quasi-)Poisson-Modell mit zufälligem Streckenintercept. Dasselbe Prinzip, andere Familie:</p>
+  <h2>Erweiterung auf Zähldaten</h2>
+  <p>Das lineare Modell bildet die Mechanik am klarsten ab. Streckenstörungen sind jedoch Zähldaten und häufig überdispers; methodisch gehört die Mundlak-Korrektur daher in ein (Quasi-)Poisson- bzw. negativ-binomiales Modell mit zufälligem Streckenintercept. Das Prinzip bleibt identisch, lediglich die Verteilungsannahme ändert sich:</p>
 
   <div class="filelabel">mundlak_count.R</div>
 <pre><span class="fn">library</span>(glmmTMB)
@@ -115,12 +115,12 @@ mc &lt;- <span class="fn">glmmTMB</span>(stoerungen ~ instandhaltung + instand_b
   </div>
 
   <h2>Fazit</h2>
-  <p>Die Mundlak-Zerlegung kostet eine Zeile Code und beantwortet die Frage, an der naive Panelmodelle scheitern: Was ist Wirkung, was ist Selektion? Wer Effekte berichtet, ohne beides getrennt zu haben, berichtet im Zweifel das Falsche.</p>
+  <p>Die Mundlak-Zerlegung kostet eine Zeile Code und beantwortet die Frage, an der naive Panelmodelle scheitern: Was ist Wirkung, was ist Selektion? Wer Effekte berichtet, ohne beide Varianzquellen getrennt zu haben, berichtet im Zweifel das Falsche.</p>
 
   <div class="cta">
     <div style="font:600 12px ui-monospace,Consolas,monospace;letter-spacing:.1em;color:#5BD61E;margin-bottom:8px">ÄHNLICHE FRAGESTELLUNG?</div>
-    <p style="margin:0 0 4px">Paneldaten, Wirkungsevaluation oder ein Modell, das produktiv laufen soll — im 30-Minuten-Erstgespräch klären wir den kürzesten Weg zur belastbaren Antwort.</p>
-    <a href="mailto:nschaefer@sove-it.de?subject=Anfrage%20Erstgespr%C3%A4ch">ERSTGESPRÄCH ANFRAGEN →</a>
+    <p style="margin:0 0 4px">Paneldaten, Wirkungsevaluation oder ein Modell, das produktiv laufen soll — im 15-minütigen Erstgespräch klären wir den kürzesten Weg zur belastbaren Antwort.</p>
+    <a href="https://cal.com/nico-schafer-xmc3xr/erstgesprach" target="_blank" rel="noopener">15-MIN-TERMIN BUCHEN →</a>
   </div>
 </article>
 

@@ -24,7 +24,7 @@
 <style>body{margin:0;background:#141414;font-family:Arial,Helvetica,sans-serif}a{color:#C9C9C9;text-decoration:none}a:hover{color:#5BD61E}html{scroll-behavior:auto}@keyframes barPulse{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.55)}}@keyframes barPulseSoft{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.72)}}@keyframes drawKM{from{stroke-dashoffset:1200}to{stroke-dashoffset:0}}@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}@keyframes dotPop{from{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}
 @media(max-width:1000px){.sv-services{grid-template-columns:repeat(2,1fr)!important}.sv-refsgrid{grid-template-columns:repeat(2,1fr)!important}}
 @media(max-width:1060px){#top{grid-template-columns:1fr!important;padding:56px 24px 48px!important;gap:40px!important}.sv-heroLockup{max-width:100%}}
-@media(max-width:860px){.sv-heroHead{font-size:40px!important}.sv-mpanel{grid-template-columns:1fr!important;padding:22px 18px!important;gap:24px!important}#methoden{padding:56px 20px 48px!important}.sv-profilgrid{grid-template-columns:1fr!important;padding:56px 20px!important;gap:32px!important}.sv-refswrap{padding:56px 20px!important}.sv-header{padding:12px 16px!important;gap:10px!important;flex-wrap:wrap}.sv-nav{gap:14px!important;flex-wrap:wrap;justify-content:flex-end}.sv-kontakt{padding:56px 20px!important}.sv-footer{padding:20px 16px!important;flex-direction:column;gap:12px;align-items:flex-start!important}}
+@media(max-width:560px){.sv-stats{flex-wrap:wrap;gap:20px 30px}.sv-stats>div{flex:1 0 40%}.sv-statval{font-size:19px!important}}@media(max-width:860px){.sv-heroHead{font-size:40px!important}.sv-mpanel{grid-template-columns:1fr!important;padding:22px 18px!important;gap:24px!important}#methoden{padding:56px 20px 48px!important}.sv-profilgrid{grid-template-columns:1fr!important;padding:56px 20px!important;gap:32px!important}.sv-refswrap{padding:56px 20px!important}.sv-header{padding:12px 16px!important;gap:10px!important;flex-wrap:wrap}.sv-nav{gap:14px!important;flex-wrap:wrap;justify-content:flex-end}.sv-kontakt{padding:56px 20px!important}.sv-footer{padding:20px 16px!important;flex-direction:column;gap:12px;align-items:flex-start!important}}
 @media(max-width:640px){.sv-services{grid-template-columns:1fr!important}.sv-refsgrid{grid-template-columns:1fr!important}.sv-navlink{display:none!important}.sv-heroHead{font-size:32px!important}.sv-heroLockup{display:none!important}.sv-kbtns{flex-direction:column;align-items:stretch!important}.sv-kbtns a{text-align:center}}</style>
 
 <div style="min-height:100vh;background:#141414">
@@ -299,10 +299,10 @@ uwot::umap(emb) |> dbscan::hdbscan(minPts = 25)</div>
       <div style="font:600 12px ui-monospace,Consolas,monospace;letter-spacing:.32em;color:#5BD61E;margin-bottom:14px">INHABER</div>
       <div style="font:700 34px/1.2 ui-monospace,Consolas,monospace;color:#fff;margin-bottom:18px">Nico Schäfer</div>
       <div style="font:15.5px/1.7 Arial,sans-serif;color:#C9C9C9;margin-bottom:28px">M.A. Soziologie (Universität Bonn), Herkunft am Lehrstuhl für Methoden der empirischen Sozialforschung. Seit 2015 selbständig als Statistiker und Data Engineer; für größere Vorhaben eingespieltes Netzwerk externer Fachexperten.</div>
-      <div style="display:flex;gap:40px;border-top:1px solid #2a2a2a;padding-top:22px">
+      <div class="sv-stats" style="display:flex;gap:40px;border-top:1px solid #2a2a2a;padding-top:22px">
         <div><div style="font:700 28px ui-monospace,Consolas,monospace;color:#fff">10+</div><div style="font:12px Arial,sans-serif;color:#767676">Jahre Projekterfahrung</div></div>
         <div><div style="font:700 28px ui-monospace,Consolas,monospace;color:#fff">2015</div><div style="font:12px Arial,sans-serif;color:#767676">gegründet, Berlin</div></div>
-        <div><div style="font:700 22px ui-monospace,Consolas,monospace;color:#fff;white-space:nowrap">R · Shiny · SQL</div><div style="font:12px Arial,sans-serif;color:#767676">Kern-Stack</div></div>
+        <div><div class="sv-statval" style="font:700 22px ui-monospace,Consolas,monospace;color:#fff">R · Shiny · SQL</div><div style="font:12px Arial,sans-serif;color:#767676">Kern-Stack</div></div>
       </div>
     </div>
   </div>
@@ -633,10 +633,10 @@ uwot::umap(emb) |> dbscan::hdbscan(minPts = 25)</div>
       <div style="font:600 12px ui-monospace,Consolas,monospace;letter-spacing:.32em;color:#5BD61E;margin-bottom:14px">FOUNDER</div>
       <div style="font:700 34px/1.2 ui-monospace,Consolas,monospace;color:#fff;margin-bottom:18px">Nico Schäfer</div>
       <div style="font:15.5px/1.7 Arial,sans-serif;color:#C9C9C9;margin-bottom:28px">M.A. Sociology (University of Bonn), rooted in the Chair of Empirical Social Research Methods. Independent statistician and data engineer since 2015; for larger undertakings backed by an established network of external experts.</div>
-      <div style="display:flex;gap:40px;border-top:1px solid #2a2a2a;padding-top:22px">
+      <div class="sv-stats" style="display:flex;gap:40px;border-top:1px solid #2a2a2a;padding-top:22px">
         <div><div style="font:700 28px ui-monospace,Consolas,monospace;color:#fff">10+</div><div style="font:12px Arial,sans-serif;color:#767676">years of project experience</div></div>
         <div><div style="font:700 28px ui-monospace,Consolas,monospace;color:#fff">2015</div><div style="font:12px Arial,sans-serif;color:#767676">founded, Berlin</div></div>
-        <div><div style="font:700 22px ui-monospace,Consolas,monospace;color:#fff;white-space:nowrap">R · Shiny · SQL</div><div style="font:12px Arial,sans-serif;color:#767676">Core stack</div></div>
+        <div><div class="sv-statval" style="font:700 22px ui-monospace,Consolas,monospace;color:#fff">R · Shiny · SQL</div><div style="font:12px Arial,sans-serif;color:#767676">Core stack</div></div>
       </div>
     </div>
   </div>

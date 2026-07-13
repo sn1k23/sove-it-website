@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' https://gc.zgo.at; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://sn1k.goatcounter.com; font-src 'self' data:; connect-src https://sn1k.goatcounter.com; base-uri 'none'; form-action 'none'; upgrade-insecure-requests">
+<meta name="description" content="Mundlak-Zerlegung in R: Within- und Between-Effekt in Paneldaten sauber trennen — mit plm, glmmTMB und produktiver Umsetzung. sove.it Methoden-Notizen.">
+<meta name="theme-color" content="#141414">
+<meta property="og:title" content="Mundlak-Zerlegung praktisch — sove.it Methoden-Notizen">
+<meta property="og:description" content="Within- und Between-Effekt in Paneldaten sauber trennen: R-Code, Grafik und produktive Umsetzung.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://www.sove-it.de/insights/mundlak-zerlegung.html">
+<meta property="og:image" content="https://www.sove-it.de/og-image.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23141414'/%3E%3Cg transform='translate(30,32)'%3E%3Crect y='10' width='5' height='26' fill='%23fff'/%3E%3Crect x='7' y='15' width='5' height='21' fill='%23fff'/%3E%3Crect x='14' width='5' height='36' fill='%23fff'/%3E%3Crect x='21' y='20' width='5' height='16' fill='%235BD61E'/%3E%3Crect x='28' y='5' width='5' height='31' fill='%23fff'/%3E%3Crect x='35' y='10' width='5' height='26' fill='%23fff'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="canonical" href="https://www.sove-it.de/insights/mundlak-zerlegung.html">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","headline":"Mundlak-Zerlegung: Within- und Between-Effekt sauber trennen","datePublished":"2026-07-13","inLanguage":"de","author":{"@type":"Person","name":"Nico Schäfer"},"publisher":{"@type":"Organization","name":"sove.it e.K."},"mainEntityOfPage":"https://www.sove-it.de/insights/mundlak-zerlegung.html","keywords":"Mundlak, Paneldaten, plm, R, Wirkungsevaluation, Within-Effekt"}
+</script>
+<title>Mundlak-Zerlegung praktisch — sove.it Methoden-Notizen</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#141414;color:#C9C9C9;font:16px/1.7 Arial,Helvetica,sans-serif}
+  a{color:#5BD61E;text-decoration:none} a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 24px}
+  header{border-bottom:1px solid #2a2a2a;padding:22px 0;margin-bottom:44px}
+  .logo{font:700 15px ui-monospace,Consolas,monospace;color:#fff;letter-spacing:.12em}
+  .logo .dot{color:#5BD61E}
+  .eyebrow{font:600 12px ui-monospace,Consolas,monospace;letter-spacing:.28em;color:#5BD61E;margin-bottom:16px}
+  h1{font:700 40px/1.15 ui-monospace,Consolas,monospace;color:#fff;margin-bottom:18px;letter-spacing:-.01em}
+  .meta{font:13px ui-monospace,Consolas,monospace;color:#767676;margin-bottom:40px}
+  h2{font:700 22px ui-monospace,Consolas,monospace;color:#fff;margin:40px 0 14px}
+  p{margin-bottom:18px} .lead{font-size:18px;color:#e6e6e6}
+  code{font-family:ui-monospace,Consolas,monospace;color:#8fe36a;font-size:.92em}
+  pre{background:#191919;border:1px solid #2a2a2a;border-radius:8px;padding:18px 20px;overflow-x:auto;margin:22px 0;
+      font:13px/1.6 ui-monospace,Consolas,monospace;color:#dcdcdc}
+  pre .cmt{color:#767676} pre .fn{color:#5BD61E}
+  .filelabel{font:600 12px ui-monospace,Consolas,monospace;color:#767676;margin:22px 0 -12px}
+  .callout{border-left:3px solid #5BD61E;background:#191919;padding:16px 20px;margin:26px 0;border-radius:0 8px 8px 0}
+  .callout .t{font:600 12px ui-monospace,Consolas,monospace;letter-spacing:.1em;color:#5BD61E;margin-bottom:8px}
+  figure{margin:28px 0} figcaption{font:12px ui-monospace,Consolas,monospace;color:#767676;margin-top:10px;text-align:center}
+  .cta{border:1px solid #2a2a2a;border-radius:10px;padding:24px;margin:48px 0;background:#191919}
+  .cta a{display:inline-block;background:#5BD61E;color:#141414;font:600 13px ui-monospace,Consolas,monospace;
+         padding:12px 20px;border-radius:6px;margin-top:8px}
+  .cta a:hover{text-decoration:none;box-shadow:0 0 20px rgba(91,214,30,.4)}
+  footer{border-top:1px solid #2a2a2a;margin-top:56px;padding:26px 0 60px;font:12px ui-monospace,Consolas,monospace;color:#5A5A5A}
+  .draftbar{background:#3a2a00;border-bottom:1px solid #5a4200;color:#f0c674;font:13px ui-monospace,Consolas,monospace;
+            text-align:center;padding:8px}
+  @media(max-width:560px){h1{font-size:30px}.wrap{padding:0 18px}}
+</style>
+</head>
+<body>
+<header><div class="wrap"><a href="/" style="color:inherit"><span class="logo">SOVE<span class="dot">.</span>IT</span></a> &nbsp;·&nbsp; <a href="/insights/" style="font:12px ui-monospace,Consolas,monospace;color:#767676">METHODEN-NOTIZEN</a></div></header>
+
+<article class="wrap">
+  <div class="eyebrow">PANELDATEN · KAUSALITÄT</div>
+  <h1>Mundlak-Zerlegung: Within- und Between-Effekt sauber trennen</h1>
+  <div class="meta">13. Juli 2026 · ~7 Min · Nico Schäfer</div>
+
+  <p class="lead">Wer Paneldaten mit einem simplen Random-Effects-Modell auswertet, mischt zwei Fragen, die nichts miteinander zu tun haben: „Was passiert, wenn <em>eine</em> Einheit sich über die Zeit verändert?" und „Wie unterscheiden sich <em>verschiedene</em> Einheiten?". Der Mundlak-Trick trennt beides — mit einer einzigen zusätzlichen Variable und ohne den Effizienzverlust eines reinen Fixed-Effects-Modells.</p>
+
+  <h2>Das Problem an einem Beispiel</h2>
+  <p>Angenommen, wir modellieren Streckenstörungen im Schienenverkehr als Funktion der Instandhaltungsintensität. Über mehrere Jahre je Streckenabschnitt (<code>strecke_id</code> × <code>jahr</code>) stellt sich die Frage: Senkt <em>mehr Instandhaltung</em> die Störungen? Ein naives Random-Effects-Modell gibt einen Koeffizienten zurück, der Within- und Between-Variation vermischt — und genau dann verzerrt ist, wenn stärker beanspruchte Strecken sowohl mehr gewartet werden <em>als auch</em> mehr stören. Selektion, als Effekt getarnt.</p>
+
+  <h2>Die Mundlak-Idee in einem Satz</h2>
+  <p>Nimm zusätzlich den <strong>Einheiten-Mittelwert</strong> jeder zeitveränderlichen Kovariate ins Modell auf. Der ursprüngliche Koeffizient misst dann den reinen <strong>Within-Effekt</strong> (Veränderung innerhalb einer Strecke), der Koeffizient des Mittelwerts die <strong>Between-Korrektur</strong>. Ist letzterer signifikant, war das naive RE-Modell verzerrt — das ist zugleich ein handlicher Hausman-Test.</p>
+
+  <div class="filelabel">mundlak.R</div>
+<pre><span class="cmt"># Einheiten-Mittelwert der zeitveränderlichen Kovariate</span>
+d &lt;- d |&gt; <span class="fn">group_by</span>(strecke_id) |&gt;
+       <span class="fn">mutate</span>(instand_bar = <span class="fn">mean</span>(instandhaltung)) |&gt; <span class="fn">ungroup</span>()
+
+<span class="cmt"># Mundlak-RE-Modell: Within-Effekt + Between-Korrektur</span>
+<span class="fn">library</span>(plm)
+m &lt;- <span class="fn">plm</span>(stoerungen ~ instandhaltung + instand_bar,
+         data = d, index = <span class="fn">c</span>(<span style="color:#c98">"strecke_id"</span>, <span style="color:#c98">"jahr"</span>),
+         model = <span style="color:#c98">"random"</span>)
+
+<span class="fn">library</span>(lmtest)
+<span class="fn">coeftest</span>(m)   <span class="cmt"># instand_bar signifikant  =&gt;  RE war verzerrt</span></pre>
+
+  <p>Der Koeffizient auf <code>instandhaltung</code> ist jetzt der Within-Effekt — numerisch identisch zum Fixed-Effects-Schätzer, aber im RE-Rahmen, sodass zeitkonstante Merkmale (Streckentyp, Region) weiter im Modell bleiben dürfen. Der Koeffizient auf <code>instand_bar</code> fängt exakt die Selektion ab, die den naiven Schätzer verzerrt hätte.</p>
+
+  <figure>
+  <svg viewBox="0 0 700 300" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;background:#191919;border:1px solid #2a2a2a;border-radius:8px">
+    <text x="24" y="30" fill="#767676" font-family="ui-monospace,Consolas,monospace" font-size="12">effekt-zerlegung</text>
+    <!-- Between (grau, positiv, irreführend) -->
+    <line x1="70" y1="240" x2="330" y2="90" stroke="#5A5A5A" stroke-width="2"/>
+    <circle cx="110" cy="210" r="4" fill="#5A5A5A"/><circle cx="170" cy="185" r="4" fill="#5A5A5A"/>
+    <circle cx="240" cy="140" r="4" fill="#5A5A5A"/><circle cx="300" cy="105" r="4" fill="#5A5A5A"/>
+    <text x="150" y="80" fill="#5A5A5A" font-family="ui-monospace,Consolas,monospace" font-size="12">between (roh): +0.31</text>
+    <!-- Within (grün, negativ, kausal) -->
+    <line x1="400" y1="110" x2="650" y2="230" stroke="#5BD61E" stroke-width="2.5"/>
+    <circle cx="430" cy="128" r="4" fill="#5BD61E"/><circle cx="500" cy="160" r="4" fill="#5BD61E"/>
+    <circle cx="560" cy="192" r="4" fill="#5BD61E"/><circle cx="620" cy="220" r="4" fill="#5BD61E"/>
+    <text x="410" y="100" fill="#5BD61E" font-family="ui-monospace,Consolas,monospace" font-size="12">within (mundlak): &minus;0.22</text>
+    <text x="24" y="285" fill="#767676" font-family="ui-monospace,Consolas,monospace" font-size="11">links: unterschiedliche strecken &nbsp;·&nbsp; rechts: veränderung innerhalb einer strecke</text>
+  </svg>
+  <figcaption>Between-Signal (grau) zeigt fälschlich einen positiven Zusammenhang — nur die Within-Zerlegung (grün) misst die Wirkung der Instandhaltung.</figcaption>
+  </figure>
+
+  <h2>Der ehrliche Zusatz: Störungen sind Zähldaten</h2>
+  <p>Das lineare Modell oben erklärt die Mechanik am saubersten. Streckenstörungen sind aber Counts, oft überstreut — methodisch gehört die Mundlak-Korrektur hier in ein (Quasi-)Poisson-Modell mit zufälligem Streckenintercept. Dasselbe Prinzip, andere Familie:</p>
+
+  <div class="filelabel">mundlak_count.R</div>
+<pre><span class="fn">library</span>(glmmTMB)
+mc &lt;- <span class="fn">glmmTMB</span>(stoerungen ~ instandhaltung + instand_bar + (1 | strecke_id),
+             family = <span class="fn">nbinom2</span>, data = d)   <span class="cmt"># Overdispersion abgedeckt</span></pre>
+
+  <div class="callout">
+    <div class="t">SO NUTZEN WIR DAS PRODUKTIV</div>
+    <p style="margin:0">In Kundenprojekten läuft die Zerlegung nicht als Einzelskript, sondern als reproduzierbarer <code>targets</code>-Schritt: Rohdaten → Panel bauen → Mundlak-Modell → automatischer Quarto-Report mit Koeffizienten-Tabelle und dieser Grafik. Neue Datenlieferung, ein Befehl, aktualisierter Bericht — die Methodik bleibt prüfbar, das Ergebnis landet ohne Handarbeit im Postfach der Fachabteilung.</p>
+  </div>
+
+  <h2>Fazit</h2>
+  <p>Die Mundlak-Zerlegung kostet eine Zeile Code und beantwortet die Frage, an der naive Panelmodelle scheitern: Was ist Wirkung, was ist Selektion? Wer Effekte berichtet, ohne beides getrennt zu haben, berichtet im Zweifel das Falsche.</p>
+
+  <div class="cta">
+    <div style="font:600 12px ui-monospace,Consolas,monospace;letter-spacing:.1em;color:#5BD61E;margin-bottom:8px">ÄHNLICHE FRAGESTELLUNG?</div>
+    <p style="margin:0 0 4px">Paneldaten, Wirkungsevaluation oder ein Modell, das produktiv laufen soll — im 30-Minuten-Erstgespräch klären wir den kürzesten Weg zur belastbaren Antwort.</p>
+    <a href="mailto:nschaefer@sove-it.de?subject=Anfrage%20Erstgespr%C3%A4ch">ERSTGESPRÄCH ANFRAGEN →</a>
+  </div>
+</article>
+
+<footer><div class="wrap">© 2026 sove.it e.K. · FROM DATA TO DECISIONS &nbsp;·&nbsp; Methoden-Notizen erscheinen wöchentlich.</div></footer>
+<script data-goatcounter="https://sn1k.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>

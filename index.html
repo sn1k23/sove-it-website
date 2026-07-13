@@ -210,7 +210,7 @@ predict(fit, newx = x_neu, type = "response")</div><div style="margin-top:12px;f
       <div style="color:#767676;margin-bottom:6px;border-bottom:1px solid #2a2a2a;padding-bottom:6px">pipeline.R</div>
       <div style="white-space:pre-line">targets::tar_make()
 plumber::pr("api.R") |> plumber::pr_run()
-DBI::dbWriteTable(con, "mart_kpi", df)</div><div style="margin-top:12px;font:11px ui-monospace,Consolas,monospace;color:#767676"><span style="color:#5A5A5A">Pakete:</span> targets (Orchestrierung) · plumber (API) · DBI + Treiber · pointblank (Validierung)</div>
+DBI::dbWriteTable(con, "mart_kpi", df)</div><div style="margin-top:12px;font:11px ui-monospace,Consolas,monospace;color:#767676"><span style="color:#5A5A5A">Pakete:</span> targets (Orchestrierung) · plumber (API) · DBI + duckdb · mongolite (Mongo) · pointblank (Validierung)</div>
       <div style="margin-top:16px;font:13px/1.6 Arial,sans-serif;color:#C9C9C9">Reproduzierbare ETL-Strecken: Rohdaten aus SQL, APIs, Crawls und OCR werden validiert, transformiert und versioniert bereitgestellt — orchestriert statt handgeklöppelt.</div>
       <div style="margin-top:10px;font:12px ui-monospace,Consolas,monospace;color:#767676">→ u. a. tägliche Sensor-Pipelines Instandhaltung</div>
     </div>
@@ -223,7 +223,7 @@ DBI::dbWriteTable(con, "mart_kpi", df)</div><div style="margin-top:12px;font:11p
       <div style="color:#767676;margin-bottom:6px;border-bottom:1px solid #2a2a2a;padding-bottom:6px">automatisierung.R</div>
       <div style="white-space:pre-line"># cron: 0 6 * * 1  # montags 06:00
 quarto::quarto_render("report.qmd")
-blastula::smtp_send(mail, to = team)</div><div style="margin-top:12px;font:11px ui-monospace,Consolas,monospace;color:#767676"><span style="color:#5A5A5A">Pakete:</span> quarto (Report) · blastula (Mail) · cronR / System-Cron (Zeitplan)</div>
+blastula::smtp_send(mail, to = team)</div><div style="margin-top:12px;font:11px ui-monospace,Consolas,monospace;color:#767676"><span style="color:#5A5A5A">Pakete:</span> quarto (Report) · blastula (Mail) · taskscheduleR (Zeitplan)</div>
       <div style="margin-top:16px;font:13px/1.6 Arial,sans-serif;color:#C9C9C9">Berichte, die sich selbst schreiben: geplante Quarto-Renderings mit Qualitäts-Checks, Alerts und Versand — der Montagsreport liegt fertig im Postfach.</div>
       <div style="margin-top:10px;font:12px ui-monospace,Consolas,monospace;color:#767676">→ u. a. KPI-Reporting Handel & Finanzen</div>
     </div>
@@ -545,7 +545,7 @@ predict(fit, newx = x_neu, type = "response")</div><div style="margin-top:12px;f
       <div style="color:#767676;margin-bottom:6px;border-bottom:1px solid #2a2a2a;padding-bottom:6px">pipeline.R</div>
       <div style="white-space:pre-line">targets::tar_make()
 plumber::pr("api.R") |> plumber::pr_run()
-DBI::dbWriteTable(con, "mart_kpi", df)</div><div style="margin-top:12px;font:11px ui-monospace,Consolas,monospace;color:#767676"><span style="color:#5A5A5A">Packages:</span> targets (orchestration) · plumber (API) · DBI + driver · pointblank (validation)</div>
+DBI::dbWriteTable(con, "mart_kpi", df)</div><div style="margin-top:12px;font:11px ui-monospace,Consolas,monospace;color:#767676"><span style="color:#5A5A5A">Packages:</span> targets (orchestration) · plumber (API) · DBI + duckdb · mongolite (Mongo) · pointblank (validation)</div>
       <div style="margin-top:16px;font:13px/1.6 Arial,sans-serif;color:#C9C9C9">Reproducible ETL: raw data from SQL, APIs, crawls and OCR is validated, transformed and served versioned — orchestrated, not hand-stitched.</div>
       <div style="margin-top:10px;font:12px ui-monospace,Consolas,monospace;color:#767676">→ e.g. daily sensor pipelines in maintenance</div>
     </div>
@@ -558,7 +558,7 @@ DBI::dbWriteTable(con, "mart_kpi", df)</div><div style="margin-top:12px;font:11p
       <div style="color:#767676;margin-bottom:6px;border-bottom:1px solid #2a2a2a;padding-bottom:6px">automatisierung.R</div>
       <div style="white-space:pre-line"># cron: 0 6 * * 1  # montags 06:00
 quarto::quarto_render("report.qmd")
-blastula::smtp_send(mail, to = team)</div><div style="margin-top:12px;font:11px ui-monospace,Consolas,monospace;color:#767676"><span style="color:#5A5A5A">Packages:</span> quarto (report) · blastula (mail) · cronR / system cron (schedule)</div>
+blastula::smtp_send(mail, to = team)</div><div style="margin-top:12px;font:11px ui-monospace,Consolas,monospace;color:#767676"><span style="color:#5A5A5A">Packages:</span> quarto (report) · blastula (mail) · taskscheduleR (schedule)</div>
       <div style="margin-top:16px;font:13px/1.6 Arial,sans-serif;color:#C9C9C9">Reports that write themselves: scheduled Quarto renders with quality checks, alerts and delivery — the Monday report is in the inbox, done.</div>
       <div style="margin-top:10px;font:12px ui-monospace,Consolas,monospace;color:#767676">→ e.g. KPI reporting in retail & finance</div>
     </div>

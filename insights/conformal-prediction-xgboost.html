@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' https://gc.zgo.at; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://sn1k.goatcounter.com; font-src 'self' data:; connect-src https://sn1k.goatcounter.com; base-uri 'none'; form-action 'none'; upgrade-insecure-requests">
+<meta name="description" content="Conformal Prediction in R: verteilungsfreie Vorhersageintervalle für XGBoost-Prognosen — mit Kalibrierquantil, Überdeckungsprüfung je Gruppe und einseitiger Alarmregel. sove.it Methoden-Notizen.">
+<meta name="theme-color" content="#141414">
+<meta property="og:title" content="Vorhersageintervalle für XGBoost-Prognosen: Conformal Prediction in R — sove.it Methoden-Notizen">
+<meta property="og:description" content="Verteilungsfreie Prognoseintervalle mit nachprüfbarer Überdeckung: R-Code, echter Lauf, Gruppenkalibrierung und die Alarmregel dazu.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://www.sove-it.de/insights/conformal-prediction-xgboost.html">
+<meta property="og:image" content="https://www.sove-it.de/og-image.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23141414'/%3E%3Cg transform='translate(30,32)'%3E%3Crect y='10' width='5' height='26' fill='%23fff'/%3E%3Crect x='7' y='15' width='5' height='21' fill='%23fff'/%3E%3Crect x='14' width='5' height='36' fill='%23fff'/%3E%3Crect x='21' y='20' width='5' height='16' fill='%235BD61E'/%3E%3Crect x='28' y='5' width='5' height='31' fill='%23fff'/%3E%3Crect x='35' y='10' width='5' height='26' fill='%23fff'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="canonical" href="https://www.sove-it.de/insights/conformal-prediction-xgboost.html">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","headline":"Vorhersageintervalle für XGBoost-Prognosen: Conformal Prediction in R","datePublished":"2026-07-30","inLanguage":"de","author":{"@type":"Person","name":"Nico Schäfer","url":"https://www.sove-it.de/#profil","sameAs":["https://www.linkedin.com/in/nicosch%C3%A4fer/","https://github.com/sn1k23"]},"publisher":{"@type":"Organization","name":"sove.it e.K."},"mainEntityOfPage":"https://www.sove-it.de/insights/conformal-prediction-xgboost.html","keywords":"Conformal Prediction, Vorhersageintervalle, XGBoost, R, Predictive Analytics, Unsicherheit, Predictive Maintenance"}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Start","item":"https://www.sove-it.de/"},{"@type":"ListItem","position":2,"name":"Insights","item":"https://www.sove-it.de/insights/"},{"@type":"ListItem","position":3,"name":"Conformal Prediction","item":"https://www.sove-it.de/insights/conformal-prediction-xgboost.html"}]}
+</script>
+<title>Vorhersageintervalle für XGBoost-Prognosen: Conformal Prediction in R — sove.it Methoden-Notizen</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#141414;color:#C9C9C9;font:16px/1.7 Arial,Helvetica,sans-serif}
+  a{color:#5BD61E;text-decoration:none} a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 24px}
+  header{border-bottom:1px solid #2a2a2a;padding:22px 0;margin-bottom:44px}
+  .logo{font:700 15px ui-monospace,Consolas,monospace;color:#fff;letter-spacing:.12em}
+  .logo .dot{color:#5BD61E}
+  .eyebrow{font:600 12px ui-monospace,Consolas,monospace;letter-spacing:.28em;color:#5BD61E;margin-bottom:16px}
+  h1{font:700 40px/1.15 ui-monospace,Consolas,monospace;color:#fff;margin-bottom:10px;letter-spacing:-.01em}
+  .kicker{font:13px/1.6 ui-monospace,Consolas,monospace;color:#767676;margin-bottom:18px}
+  .meta{font:13px ui-monospace,Consolas,monospace;color:#767676;margin-bottom:40px}
+  h2{font:700 22px ui-monospace,Consolas,monospace;color:#fff;margin:40px 0 14px}
+  p{margin-bottom:18px} .lead{font-size:18px;color:#e6e6e6}
+  ul{margin:0 0 18px 22px} li{margin-bottom:8px}
+  code{font-family:ui-monospace,Consolas,monospace;color:#8fe36a;font-size:.92em}
+  pre{background:#191919;border:1px solid #2a2a2a;border-radius:8px;padding:18px 20px;overflow-x:auto;margin:22px 0;
+      font:13px/1.6 ui-monospace,Consolas,monospace;color:#dcdcdc}
+  pre .cmt{color:#767676} pre .fn{color:#5BD61E}
+  .filelabel{font:600 12px ui-monospace,Consolas,monospace;color:#767676;margin:22px 0 -12px}
+  .callout{border-left:3px solid #5BD61E;background:#191919;padding:16px 20px;margin:26px 0;border-radius:0 8px 8px 0}
+  .callout .t{font:600 12px ui-monospace,Consolas,monospace;letter-spacing:.1em;color:#5BD61E;margin-bottom:8px}
+  figure{margin:28px 0} figcaption{font:12px ui-monospace,Consolas,monospace;color:#767676;margin-top:10px;text-align:center}
+  .cta{border:1px solid #2a2a2a;border-radius:10px;padding:24px;margin:48px 0;background:#191919}
+  .cta a{display:inline-block;background:#5BD61E;color:#141414;font:600 13px ui-monospace,Consolas,monospace;
+         padding:12px 20px;border-radius:6px;margin-top:8px}
+  .cta a:hover{text-decoration:none;box-shadow:0 0 20px rgba(91,214,30,.4)}
+  .note{border-top:1px solid #2a2a2a;margin-top:40px;padding-top:18px;font:13px/1.6 ui-monospace,Consolas,monospace;color:#767676}
+  footer{border-top:1px solid #2a2a2a;margin-top:56px;padding:26px 0 60px;font:12px ui-monospace,Consolas,monospace;color:#5A5A5A}
+  @media(max-width:560px){h1{font-size:30px}.wrap{padding:0 18px}}
+</style>
+</head>
+<body>
+<header><div class="wrap"><a href="/" style="color:inherit"><span class="logo">SOVE<span class="dot">.</span>IT</span></a> &nbsp;·&nbsp; <a href="/insights/" style="font:12px ui-monospace,Consolas,monospace;color:#767676">METHODEN-NOTIZEN</a></div></header>
+
+<article class="wrap">
+  <div class="eyebrow">PREDICTIVE ANALYTICS · UNSICHERHEIT</div>
+  <h1>Vorhersageintervalle für XGBoost-Prognosen: Conformal Prediction in R</h1>
+  <div class="kicker">Methoden-Notizen — Verfahren, die eine Entscheidung tragen, mit der Prüfgröße, die dazugehört.</div>
+  <div class="meta">30. Juli 2026 · ~9 Min · Nico Schäfer</div>
+
+  <p class="lead">Ein Modell sagt eine Restlaufzeit von 41 Tagen vorher. Ob 41 auch 12 heißen könnte, steht in dieser Zahl nicht — und für die Wartungsentscheidung ist genau das die relevante Information. Achtzehn Zeilen R liefern sie: ein Intervall mit nachprüfbarer Überdeckung. Der Nebeneffekt ist der eigentliche Gewinn: In dem hier gerechneten Beispiel hält das Intervall über alle Anlagen die zugesagten 90 Prozent — und deckt im kritischen Segment nur 49 Prozent der Fälle ab. Sichtbar wird das erst, wenn man je Gruppe nachmisst.</p>
+
+  <h2>Das Praxisproblem</h2>
+  <p>Prognoseprojekte enden fast immer an derselben Stelle. Das Modell läuft, die Güte ist dokumentiert, die Prognose liegt vor — und dann fragt der Fachbereich, ob man sich darauf verlassen kann. Ein Punktwert kann diese Frage nicht beantworten. Wer eine Instandhaltung terminiert, ein Ersatzteil disponiert oder eine Anlage in der Priorisierung nach oben zieht, entscheidet anhand des ungünstigen Rands, nicht anhand des erwarteten Werts.</p>
+  <p>Klassische Vorhersageintervalle kommen aus der Modellwelt der linearen Regression: normalverteilte, homoskedastische Fehler. Sobald Gradient Boosting, Random Forest oder ein gestapeltes Modell im Einsatz ist, sind diese Annahmen nicht erfüllt, und die üblichen Intervalle sind entweder nicht verfügbar oder falsch kalibriert. Die verbreitete Notlösung — Quantile aus der Streuung der Residuen im Trainingsset — ist zu optimistisch, weil sie den Fehler dort schätzt, wo das Modell angepasst wurde.</p>
+
+  <h2>Das Verfahren in einem Satz</h2>
+  <p>Split-Conformal-Prediction kalibriert das Intervall auf einem separaten, vom Training unberührten Kalibrierdatensatz: Das Quantil der dort beobachteten absoluten Fehler wird zur Intervallbreite — verteilungsfrei, modell-agnostisch, mit garantierter durchschnittlicher Überdeckung.</p>
+
+  <h2>Der Mechanismus, Zeile für Zeile</h2>
+  <p>Die Daten werden dreigeteilt: Training, Kalibrierung, Test. Das Modell sieht nur das Trainingsset. Auf dem Kalibrierset werden die absoluten Abweichungen berechnet — im Sprachgebrauch des Verfahrens die <em>nonconformity scores</em>. Das empirische (1&nbsp;−&nbsp;α)-Quantil dieser Scores ist die halbe Intervallbreite.</p>
+
+  <div class="filelabel">conformal_split.R</div>
+<pre><span class="fn">library</span>(xgboost)   <span class="cmt"># &gt;= 3.0.0, neue x/y-Schnittstelle</span>
+
+<span class="fn">set.seed</span>(42)
+n   &lt;- <span class="fn">nrow</span>(df); idx &lt;- <span class="fn">sample</span>(n)
+tr  &lt;- idx[<span class="fn">seq_len</span>(<span class="fn">floor</span>(.6 * n))]                <span class="cmt"># Training</span>
+cal &lt;- idx[(<span class="fn">floor</span>(.6 * n) + 1):<span class="fn">floor</span>(.8 * n)]     <span class="cmt"># Kalibrierung — vom Training unberuehrt</span>
+te  &lt;- idx[(<span class="fn">floor</span>(.8 * n) + 1):n]                 <span class="cmt"># Test</span>
+
+fit &lt;- <span class="fn">xgboost</span>(x = df[tr, x_vars, drop = <span class="fn">FALSE</span>], y = df$y[tr],
+               nrounds = 300, max_depth = 4, learning_rate = .05,
+               nthreads = 1, verbosity = 0, seed = 42)
+
+pred &lt;- <span class="fn">function</span>(rows) <span class="fn">predict</span>(fit, df[rows, x_vars, drop = <span class="fn">FALSE</span>])
+
+s &lt;- <span class="fn">abs</span>(df$y[cal] - <span class="fn">pred</span>(cal))                   <span class="cmt"># nonconformity scores</span>
+s &lt;- s[!<span class="fn">is.na</span>(s)]                                 <span class="cmt"># NA wuerde sort() still verschieben</span>
+alpha &lt;- 0.10
+k &lt;- <span class="fn">ceiling</span>((<span class="fn">length</span>(s) + 1) * (1 - alpha))       <span class="cmt"># endliche Korrektur, nicht quantile(s, .9)</span>
+q &lt;- <span class="fn">if</span> (k &gt; <span class="fn">length</span>(s)) <span class="fn">Inf</span> <span class="fn">else</span> <span class="fn">sort</span>(s)[k]       <span class="cmt"># zu kleines Kalibrierset -&gt; kein endliches Quantil</span>
+
+fc  &lt;- <span class="fn">pred</span>(te)
+out &lt;- <span class="fn">data.frame</span>(y = df$y[te], fit = fc, lo = fc - q, hi = fc + q)
+
+<span class="fn">mean</span>(out$y &gt;= out$lo &amp; out$y &lt;= out$hi)           <span class="cmt"># empirische Ueberdeckung, Ziel 0.90</span></pre>
+
+  <p>Die Zeile mit <code>k</code> ist der Punkt, an dem selbstgebaute Varianten meist schiefgehen: Korrekt ist das ⌈(n+1)(1−α)⌉-kleinste Score, nicht das Stichprobenquantil. Diese Korrektur um den einen Rang ist der Grund, warum die Garantie auch bei kleinen Kalibriersets hält — und sie erklärt zugleich, warum <code>k</code> größer als die Anzahl der Scores werden kann: Bei α&nbsp;=&nbsp;0,10 braucht man mindestens neun Kalibrierfälle, sonst existiert kein endliches Quantil und die ehrliche Antwort ist ein unendlich breites Intervall. Wer nicht selbst rechnen will, nimmt <code>probably::int_conformal_split()</code> aus dem tidymodels-Ökosystem; die Logik ist dieselbe, eingebettet in Workflows.</p>
+
+  <h2>Was der Lauf zeigt</h2>
+  <p>Das Beispiel unten rechnet mit 4.000 simulierten Anlagen — 2.400 für das Training, je 800 für Kalibrierung und Test —, deren Restlaufzeit von Beanspruchung, Alter, Historienlänge und Temperatur abhängt. Bei 800 Kalibrierfällen und α&nbsp;=&nbsp;0,10 ist <code>k</code>&nbsp;=&nbsp;721; das zugehörige Score beträgt 30,2 Tage. Jede Prognose bekommt also ein Intervall von ±&nbsp;30,2 Tagen, und auf dem Testset liegen 91,0 Prozent der tatsächlichen Restlaufzeiten darin. Die Garantie sagt für diese Größenordnung eine Überdeckung zwischen 0,9000 und 0,9012 voraus — der konservative Überschuss von 1/(n+1) ist bei 800 Kalibrierfällen vernachlässigbar, bei 50 wäre er es nicht.</p>
+  <p>Die 91,0 Prozent sind das Ergebnis <em>eines</em> Splits. Über 200 zufällige Wiederholungen desselben Aufbaus liegt die empirische Überdeckung im Mittel bei 0,899 mit einer Streuung von 0,015; 90 Prozent der Läufe landen zwischen 0,872 und 0,924. Die Garantie gilt im Mittel über Splits, nicht für den einzelnen. Wer aus einem Lauf mit 0,88 schließt, das Verfahren sei kaputt, hat die Streuung des Schätzers vor sich, nicht einen Fehler.</p>
+
+  <h2>Der Mittelwert verdeckt das Segment, auf das es ankommt</h2>
+  <p>Interessant wird es bei den Teilgruppen. Die simulierten Anlagen gehören zu drei Segmenten mit unterschiedlich dichter Sensorhistorie; Segment&nbsp;C ist am schlechtesten prognostizierbar. Mit einem einzigen Quantil für alle liegt die Überdeckung in Segment&nbsp;A bei 0,995, in Segment&nbsp;B bei 0,955 — und in Segment&nbsp;C bei 0,508. Über 200 Wiederholungen sind es in Segment&nbsp;C im Mittel 0,486, im ungünstigsten Lauf 0,300. Die marginalen 90&nbsp;Prozent sind eingehalten; die Anlagen, bei denen die Entscheidung wehtut, sind trotzdem systematisch zu eng eingerahmt.</p>
+
+  <figure>
+  <svg viewBox="0 0 700 320" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;background:#191919;border:1px solid #2a2a2a;border-radius:8px">
+<text x="24" y="28" fill="#767676" font-family="ui-monospace,Consolas,monospace" font-size="12">ueberdeckung je anlagensegment (ziel 0.90)</text>
+<line x1="62" y1="250.0" x2="676" y2="250.0" stroke="#2a2a2a" stroke-width="1"/>
+<text x="56" y="254.0" fill="#5A5A5A" font-family="ui-monospace,Consolas,monospace" font-size="10" text-anchor="end">0.00</text>
+<line x1="62" y1="202.5" x2="676" y2="202.5" stroke="#2a2a2a" stroke-width="1"/>
+<text x="56" y="206.5" fill="#5A5A5A" font-family="ui-monospace,Consolas,monospace" font-size="10" text-anchor="end">0.25</text>
+<line x1="62" y1="155.0" x2="676" y2="155.0" stroke="#2a2a2a" stroke-width="1"/>
+<text x="56" y="159.0" fill="#5A5A5A" font-family="ui-monospace,Consolas,monospace" font-size="10" text-anchor="end">0.50</text>
+<line x1="62" y1="107.5" x2="676" y2="107.5" stroke="#2a2a2a" stroke-width="1"/>
+<text x="56" y="111.5" fill="#5A5A5A" font-family="ui-monospace,Consolas,monospace" font-size="10" text-anchor="end">0.75</text>
+<line x1="62" y1="60.0" x2="676" y2="60.0" stroke="#2a2a2a" stroke-width="1"/>
+<text x="56" y="64.0" fill="#5A5A5A" font-family="ui-monospace,Consolas,monospace" font-size="10" text-anchor="end">1.00</text>
+<line x1="62" y1="79.0" x2="676" y2="79.0" stroke="#C9C9C9" stroke-width="1" stroke-dasharray="4 4"/>
+<text x="676" y="73.0" fill="#C9C9C9" font-family="ui-monospace,Consolas,monospace" font-size="10" text-anchor="end">ziel 0.90</text>
+<rect x="90" y="60.9" width="34" height="189.1" fill="#5A5A5A"/>
+<text x="107.0" y="54.9" fill="#5A5A5A" font-family="ui-monospace,Consolas,monospace" font-size="11" text-anchor="middle">1.00</text>
+<rect x="142" y="81.9" width="34" height="168.1" fill="#5BD61E"/>
+<text x="159.0" y="75.9" fill="#5BD61E" font-family="ui-monospace,Consolas,monospace" font-size="11" text-anchor="middle">0.88</text>
+<text x="133" y="268" fill="#C9C9C9" font-family="ui-monospace,Consolas,monospace" font-size="11" text-anchor="middle">segment a (n=433)</text>
+<rect x="280" y="68.5" width="34" height="181.5" fill="#5A5A5A"/>
+<text x="297.0" y="62.5" fill="#5A5A5A" font-family="ui-monospace,Consolas,monospace" font-size="11" text-anchor="middle">0.96</text>
+<rect x="332" y="76.2" width="34" height="173.8" fill="#5BD61E"/>
+<text x="349.0" y="70.2" fill="#5BD61E" font-family="ui-monospace,Consolas,monospace" font-size="11" text-anchor="middle">0.91</text>
+<text x="323" y="268" fill="#C9C9C9" font-family="ui-monospace,Consolas,monospace" font-size="11" text-anchor="middle">segment b (n=247)</text>
+<rect x="470" y="153.4" width="34" height="96.6" fill="#5A5A5A"/>
+<text x="487.0" y="147.4" fill="#5A5A5A" font-family="ui-monospace,Consolas,monospace" font-size="11" text-anchor="middle">0.51</text>
+<rect x="522" y="71.1" width="34" height="178.9" fill="#5BD61E"/>
+<text x="539.0" y="65.1" fill="#5BD61E" font-family="ui-monospace,Consolas,monospace" font-size="11" text-anchor="middle">0.94</text>
+<text x="513" y="268" fill="#C9C9C9" font-family="ui-monospace,Consolas,monospace" font-size="11" text-anchor="middle">segment c (n=120)</text>
+<rect x="90" y="288" width="12" height="12" fill="#5A5A5A"/><text x="108" y="298" fill="#767676" font-family="ui-monospace,Consolas,monospace" font-size="11">ein quantil fuer alle</text>
+<rect x="300" y="288" width="12" height="12" fill="#5BD61E"/><text x="318" y="298" fill="#767676" font-family="ui-monospace,Consolas,monospace" font-size="11">quantil je segment (mondrian)</text>
+</svg>
+  <figcaption>Ein Quantil für alle (grau) hält im Mittel, versagt aber in Segment&nbsp;C. Gruppenweise Kalibrierung (grün) stellt die Überdeckung in jedem Segment her — zum Preis breiterer Intervalle dort, wo das Modell tatsächlich unsicher ist.</figcaption>
+  </figure>
+
+  <h2>Konstante Breite ist selten die Wahrheit</h2>
+  <p>Das Basisverfahren liefert für jeden Fall dieselbe Intervallbreite. Das ist ehrlich, aber informationsarm: Bei einer Anlage mit dichter Sensorhistorie ist die Prognose besser als bei einer neu angeschlossenen, und das sollte das Intervall zeigen. Zwei Erweiterungen führen zu fallabhängiger Breite. Die erste normiert den Score an einer geschätzten lokalen Streuung: Ein zweites Modell prognostiziert den absoluten Fehler, und der Score wird durch diese Prognose geteilt. Das Intervall wird dort breit, wo das Fehlermodell hohe Unsicherheit erwartet. Die zweite und heute üblichere ist <em>conformalized quantile regression</em>: Statt eines Mittelwertmodells werden zwei Quantilmodelle geschätzt — etwa das 5- und das 95-Prozent-Quantil —, und die Konformalisierung korrigiert lediglich, wie weit diese Quantile daneben liegen. Das Ergebnis erbt die Form der bedingten Verteilung und behält die Überdeckungsgarantie. In R steht sie als <code>probably::int_conformal_quantile()</code> bereit; wenn kein separates Kalibrierset abzugeben ist, leistet <code>probably::int_conformal_cv()</code> dasselbe über Resampling statt über einen Split.</p>
+  <p>Für Gruppenstrukturen — Anlagentypen, Baureihen, Standorte — gibt es zusätzlich die gruppenweise Kalibrierung, in der Literatur <em>Mondrian Conformal Prediction</em>: je Gruppe ein eigenes Quantil. Im Beispiel liefert das 15,9 Tage für Segment&nbsp;A, 26,9 für B und 77,1 für C — und damit Überdeckungen von 0,885, 0,915 und 0,942 bei 0,903 insgesamt. Das kostet Kalibrierfälle pro Gruppe und hat eine harte Bedingung, die in der Praxis oft übergangen wird: Die Gruppeneinteilung muss vorab feststehen und darf nicht aus den Daten oder aus der Modellausgabe abgeleitet werden. Wer die Gruppen nach dem Blick auf die Überdeckung bildet, verliert die Garantie, die er gerade prüfen wollte.</p>
+
+  <h2>Zwei Annahmen, die man kennen muss</h2>
+  <p>Conformal Prediction ist annahmearm, aber nicht annahmefrei. Vorausgesetzt wird <strong>Austauschbarkeit</strong> von Kalibrier- und Testdaten. Das ist schwächer als „identisch verteilt und unabhängig“ und heißt nicht, dass beide aus derselben Verteilung stammen müssen: Verlangt wird, dass die gemeinsame Verteilung der Fälle invariant gegenüber ihrer Reihenfolge ist — jede Permutation ist gleich wahrscheinlich. Abhängige Fälle sind damit vereinbar, ein Trend oder ein Regimewechsel nicht. Bei Zeitreihen ist die Annahme systematisch verletzt; hier braucht es zeitliche Splits statt zufälliger, ein rollierendes Kalibrierfenster und im Zweifel online kalibrierende Varianten, die die Intervallbreite anhand der zuletzt beobachteten Überdeckung nachziehen (<code>conformalForecast</code>, <code>AdaptiveConformal</code>).</p>
+  <p>Zweitens darf das Kalibrierset das Modell nie gesehen haben. Jede Form von Leckage — Hyperparameter-Tuning über alle Daten, Feature-Selektion vor dem Split, dieselbe Anlage in Trainings- und Kalibrierset bei genesteten Daten — macht die Intervalle zu eng. Bei genesteten Daten wird deshalb auf der Ebene der Einheit gesplittet, nicht auf der Ebene der Beobachtung.</p>
+  <p>Ein dritter Punkt betrifft speziell Restlaufzeiten: Wenn Anlagen im Beobachtungsfenster noch nicht ausgefallen sind, ist die Zielgröße zensiert, und die beobachteten Fehler auf dem Kalibrierset sind systematisch zu klein. Zensierte Fälle gehören entweder aus dem Kalibrierset heraus oder in ein Verfahren, das die Zensierung modelliert — Standard-Conformal auf zensierten Daten liefert Intervalle, die man nicht verteidigen kann. Und die untere Grenze wird an der Null abgeschnitten: Eine negative Restlaufzeit ist keine Aussage.</p>
+
+  <h2>So nutzen wir das produktiv</h2>
+  <p>In einer Instandhaltungslogik entscheidet die Intervalluntergrenze, nicht die Punktprognose. Ein Alarm wird ausgelöst, wenn die untere Grenze der prognostizierten Restlaufzeit unter den Vorlauf fällt, den Disposition und Sperrung brauchen. Für diese Regel ist das zweiseitige Intervall das falsche Werkzeug: Relevant ist allein die Unterschreitung, also wird einseitig kalibriert — mit dem vorzeichenbehafteten Score, nicht mit dem absoluten.</p>
+
+  <div class="filelabel">alarmregel.R</div>
+<pre><span class="cmt"># Einseitige Kalibrierung fuer die Alarmregel: nur die Unterschreitung zaehlt</span>
+s1 &lt;- <span class="fn">pred</span>(cal) - df$y[cal]                       <span class="cmt"># positiv = Modell hat ueberschaetzt</span>
+s1 &lt;- s1[!<span class="fn">is.na</span>(s1)]
+k1 &lt;- <span class="fn">ceiling</span>((<span class="fn">length</span>(s1) + 1) * (1 - 0.10))      <span class="cmt"># 10 %% Unterschreitung zugelassen</span>
+q1 &lt;- <span class="fn">if</span> (k1 &gt; <span class="fn">length</span>(s1)) <span class="fn">Inf</span> <span class="fn">else</span> <span class="fn">sort</span>(s1)[k1]
+
+lo &lt;- <span class="fn">pmax</span>(<span class="fn">pred</span>(te) - q1, 0)                      <span class="cmt"># Restlaufzeit ist nicht negativ</span>
+alarm &lt;- lo &lt; vorlauf_tage</pre>
+
+  <p>Der Unterschied ist beträchtlich: Das zweiseitige 90-Prozent-Intervall setzt die untere Grenze 30,2 Tage unter die Prognose — einseitig gerechnet reichen dafür 17,3 Tage, weil das Risiko nur noch auf einer Seite liegt. Wer die zweiseitige Grenze für eine einseitige Frage benutzt, plant also gut zwei Wochen Vorlauf ein, die die Fragestellung gar nicht verlangt. In diesem Split lagen 12,9 Prozent der tatsächlichen Restlaufzeiten unter der einseitigen Grenze statt der nominellen 10 — dieselbe Split-Streuung wie oben, und der Grund, warum die Überdeckung eine laufend gemessene Kennzahl sein muss und keine einmalige Abnahme.</p>
+  <p>Die Prognoseunsicherheit wird damit Teil der Entscheidungsregel, statt in einer Fußnote zu stehen. In einer Shiny-Anwendung heißt das: Balken für die Punktprognose, Band für das Intervall, Schwellenlinie darüber, und ein sichtbares Feld für die aktuelle empirische Überdeckung.</p>
+
+  <div class="callout">
+    <div class="t">SO NUTZEN WIR DAS PRODUKTIV</div>
+    <p style="margin:0">Der Kalibrierschritt gehört in die Pipeline, nicht ins Skript: Neu-Kalibrierung bei jedem Lauf, Überdeckung als überwachte Kennzahl über die Zeit, gruppenweise ausgewiesen. Driftet sie unter das Ziel, ist das Modell nicht plötzlich schlechter geworden — die Datenlage hat sich verschoben, und das ist eine Information, die man haben will, bevor der Fachbereich sie bemerkt.</p>
+  </div>
+
+  <h2>Was standardmäßig dazugehört</h2>
+  <ul>
+    <li>Dreiteilung Training / Kalibrierung / Test; das Kalibrierset bleibt vom Training und vom Tuning unberührt.</li>
+    <li>Quantil mit der ⌈(n+1)(1−α)⌉-Korrektur; Mindest-Kalibrierumfang prüfen (bei α&nbsp;=&nbsp;0,10 mindestens 9 Fälle), NA vorher entfernen.</li>
+    <li>Empirische Überdeckung auf dem Testset ausweisen, nicht nur die nominale — und den konservativen Überschuss bis 1&nbsp;−&nbsp;α&nbsp;+&nbsp;1/(n+1) mitdenken.</li>
+    <li>Überdeckung je relevanter Teilgruppe prüfen; gruppenweise (Mondrian) nur mit vorab festgelegten Gruppen kalibrieren.</li>
+    <li>Bei heteroskedastischen Daten fallabhängige Breite (normierte Scores oder conformalized quantile regression).</li>
+    <li>Bei Zeitreihen zeitlich splitten, rollierend kalibrieren, Austauschbarkeit explizit diskutieren.</li>
+    <li>Bei genesteten Daten auf Einheitenebene splitten; bei Restlaufzeiten Zensierung klären und die untere Grenze bei Null abschneiden.</li>
+    <li>Neu-Kalibrierung als Pipeline-Schritt, Überdeckung als laufende Kennzahl.</li>
+  </ul>
+
+  <h2>Wann das ein Thema für ein Gespräch ist</h2>
+  <p>Drei Anlässe, bei denen dieser Schritt üblicherweise fällig wird: Ein Prognosemodell ist im Einsatz, und der Fachbereich fragt nach der Verlässlichkeit einzelner Werte — es gibt aber nur Gütemaße über alle Fälle. Aus einer Prognose soll eine Schwelle oder eine Alarmregel werden, und die Frage nach dem Puffer wird derzeit über Erfahrungswerte beantwortet. Oder ein bestehendes Modell liefert im Mittel gute Zahlen, in einem Segment aber sichtbar schlechte Entscheidungen — und die Überdeckung ist nie nach Gruppen geprüft worden.</p>
+
+  <div class="cta">
+    <div style="font:600 12px ui-monospace,Consolas,monospace;letter-spacing:.1em;color:#5BD61E;margin-bottom:8px">ÄHNLICHE FRAGESTELLUNG?</div>
+    <p style="margin:0 0 4px">Ein Prognosemodell, das eine Entscheidung tragen soll — im 15-minütigen Erstgespräch klären wir, welche Prüfgröße dazugehört und wie sie in den Betrieb kommt.</p>
+    <a href="https://cal.com/nico-schafer-xmc3xr/erstgesprach" target="_blank" rel="noopener">15-MIN-TERMIN BUCHEN →</a>
+  </div>
+
+  <p class="note">Alle Zahlen stammen aus einem tatsächlich gelaufenen Beispiel mit simulierten Daten (4.000 Anlagen, drei Segmente mit unterschiedlicher Fehlerstreuung, xgboost 3.2, <code>set.seed(42)</code>) — keine Projektergebnisse und keine illustrativen Werte. Kalibrierquantil, Überdeckungsrechnung und Gruppenauswertung sind der oben gezeigte R-Code.</p>
+</article>
+
+<footer><div class="wrap">© 2026 sove.it e.K. · FROM DATA TO DECISIONS &nbsp;·&nbsp; Methoden-Notizen erscheinen monatlich.</div></footer>
+<script data-goatcounter="https://sn1k.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>

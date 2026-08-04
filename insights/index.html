@@ -12,8 +12,16 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://www.sove-it.de/insights/">
 <meta property="og:image" content="https://www.sove-it.de/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:site_name" content="sove.it e.K.">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://www.sove-it.de/og-image.png">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23141414'/%3E%3Cg transform='translate(30,32)'%3E%3Crect y='10' width='5' height='26' fill='%23fff'/%3E%3Crect x='7' y='15' width='5' height='21' fill='%23fff'/%3E%3Crect x='14' width='5' height='36' fill='%23fff'/%3E%3Crect x='21' y='20' width='5' height='16' fill='%235BD61E'/%3E%3Crect x='28' y='5' width='5' height='31' fill='%23fff'/%3E%3Crect x='35' y='10' width='5' height='26' fill='%23fff'/%3E%3C/g%3E%3C/svg%3E">
 <link rel="canonical" href="https://www.sove-it.de/insights/">
+<link rel="alternate" type="application/atom+xml" title="sove.it Methoden-Notizen" href="https://www.sove-it.de/insights/feed.xml">
+<meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large">
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
   body{background:#141414;color:#C9C9C9;font:16px/1.7 Arial,Helvetica,sans-serif}
@@ -29,39 +37,65 @@
   .post:hover .pt{color:#5BD61E}
   .pmeta{font:12px ui-monospace,Consolas,monospace;color:#767676;margin-bottom:8px}
   .pt{font:700 22px ui-monospace,Consolas,monospace;color:#fff;margin-bottom:8px;transition:color .2s}
+  h2.pt{font:700 22px ui-monospace,Consolas,monospace;color:#fff;margin:0 0 8px;transition:color .2s}
   .pex{color:#C9C9C9}
   .tag{display:inline-block;font:600 10px ui-monospace,Consolas,monospace;letter-spacing:.1em;color:#5BD61E;border:1px solid #2a2a2a;border-radius:4px;padding:3px 8px;margin-right:6px}
   footer{border-top:1px solid #2a2a2a;margin-top:56px;padding:26px 0 60px;font:12px ui-monospace,Consolas,monospace;color:#5A5A5A}
   @media(max-width:560px){h1{font-size:30px}.wrap{padding:0 18px}}
 </style>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Blog",
+ "@id":"https://www.sove-it.de/insights/#blog",
+ "name":"Methoden-Notizen",
+ "alternateName":"sove.it Insights",
+ "description":"Methoden-Notizen von sove.it: Statistik, R und produktive Datenanalyse — ein Verfahren je Beitrag, mit lauffähigem Code und der Prüfgröße, die dazugehört.",
+ "url":"https://www.sove-it.de/insights/",
+ "inLanguage":"de",
+ "image":"https://www.sove-it.de/og-image.png",
+ "publisher":{"@type":"Organization","name":"sove.it e.K.","url":"https://www.sove-it.de/"},
+ "author":{"@type":"Person","name":"Nico Schäfer","url":"https://www.sove-it.de/#profil"},
+ "blogPost":[
+   {"@type":"BlogPosting","headline":"Vorhersageintervalle für XGBoost-Prognosen: Conformal Prediction in R","url":"https://www.sove-it.de/insights/conformal-prediction-xgboost.html","datePublished":"2026-07-30"},
+   {"@type":"BlogPosting","headline":"Mundlak-Zerlegung in R: Within- und Between-Effekt in Paneldaten trennen","url":"https://www.sove-it.de/insights/mundlak-zerlegung.html","datePublished":"2026-07-13"}]}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
+ {"@type":"ListItem","position":1,"name":"Start","item":"https://www.sove-it.de/"},
+ {"@type":"ListItem","position":2,"name":"Methoden-Notizen","item":"https://www.sove-it.de/insights/"}]}
+</script>
 </head>
 <body>
 <header><div class="wrap"><a href="/" style="color:inherit"><span class="logo">SOVE<span class="dot">.</span>IT</span></a> &nbsp;·&nbsp; <span style="font:12px ui-monospace,Consolas,monospace;color:#767676">METHODEN-NOTIZEN</span></div></header>
 
 <main class="wrap">
   <div class="eyebrow">METHODEN-NOTIZEN</div>
-  <h1>Kurz notiert, aus der Praxis.</h1>
-  <p class="intro">Statistik, R und produktive Datenanalyse — kein Buzzword-Katalog, sondern Methoden, die wir in realen Projekten einsetzen, mit lauffähigem Code und dem ehrlichen Blick auf die Grenzen. Neue Notiz monatlich.</p>
+  <h1>Methoden-Notizen: Statistik, R und produktive Datenanalyse</h1>
+  <p class="intro">Statistik, R und produktive Datenanalyse — kein Buzzword-Katalog, sondern Methoden, die ich in realen Projekten einsetze, mit lauffähigem Code und dem ehrlichen Blick auf die Grenzen. Erscheint regelmäßig, zuletzt am 30. Juli 2026.</p>
+  <p class="intro" style="margin-bottom:40px">Wie diese Methoden im Projekt eingesetzt werden: <a href="/#leistungen">Leistungen von sove.it</a>.</p>
 
   <a class="post" href="/insights/conformal-prediction-xgboost.html">
-    <div class="pmeta">30. Juli 2026 &middot; ~9 Min</div>
-    <div class="pt">Vorhersageintervalle für XGBoost-Prognosen: Conformal Prediction in R</div>
-    <div class="pex">Ein Punktwert sagt nicht, wie sicher er ist. Achtzehn Zeilen R liefern ein Intervall mit nachprüfbarer Überdeckung — und zeigen, dass die zugesagten 90 Prozent im kritischen Anlagensegment nur 49 Prozent sind.</div>
+    <div class="pmeta"><time datetime="2026-07-30">30. Juli 2026</time> · ~9 Min Lesezeit</div>
+    <h2 class="pt">Vorhersageintervalle für XGBoost-Prognosen: Conformal Prediction in R</h2>
+    <div class="pex">Ein Punktwert sagt nicht, wie sicher er ist. Keine zwanzig Zeilen R liefern ein Intervall mit nachprüfbarer Überdeckung — und zeigen im simulierten Beispiel, wie aus zugesagten 90 Prozent im kritischen Segment 50,8 Prozent werden können.</div>
     <div style="margin-top:12px"><span class="tag">PREDICTIVE ANALYTICS</span><span class="tag">UNSICHERHEIT</span><span class="tag">R</span></div>
   </a>
 
   <a class="post" href="/insights/mundlak-zerlegung.html">
-    <div class="pmeta">13. Juli 2026 · ~7 Min</div>
-    <div class="pt">Mundlak-Zerlegung: Within- und Between-Effekt sauber trennen</div>
+    <div class="pmeta"><time datetime="2026-07-13">13. Juli 2026</time> · ~7 Min Lesezeit</div>
+    <h2 class="pt">Mundlak-Zerlegung in R: Within- und Between-Effekt in Paneldaten trennen</h2>
     <div class="pex">Warum naive Panelmodelle Wirkung und Selektion vermischen — und wie eine einzige Zeile Code beides trennt. Mit plm, glmmTMB und produktiver Umsetzung.</div>
-    <div style="margin-top:12px"><span class="tag">PANELDATEN</span><span class="tag">KAUSALITÄT</span><span class="tag">R</span></div>
+    <div style="margin-top:12px"><span class="tag">PANELDATEN</span><span class="tag">KAUSALANALYSE</span><span class="tag">R</span></div>
   </a>
 
-  <!-- MONATLICH: neuen <a class="post">…</a> oben einfügen -->
+  <!-- NEUER BEITRAG: (1) neuen <a class="post">…</a> oben einfuegen, Titel als <h2 class="pt">,
+       Datum als <time datetime="JJJJ-MM-TT">, Trennzeichen "·";
+       (2) Eintrag oben in blogPost im JSON-LD im <head> ergaenzen;
+       (3) neuen <entry> oben in /insights/feed.xml, <updated> im <feed> mitziehen;
+       (4) sitemap.xml: <lastmod> dieser Seite und des neuen Beitrags setzen. -->
 
 </main>
 
-<footer><div class="wrap">© 2026 sove.it e.K. · FROM DATA TO DECISIONS &nbsp;·&nbsp; <a href="/">zurück zur Startseite</a></div></footer>
+<footer><div class="wrap">© 2026 sove.it e.K. · FROM DATA TO DECISIONS &nbsp;·&nbsp; <a href="/">sove.it: Statistik, Data Science und R-Anwendungen</a></div></footer>
 <script data-goatcounter="https://sn1k.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>

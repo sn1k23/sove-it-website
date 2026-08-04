@@ -4,22 +4,53 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' https://gc.zgo.at; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://sn1k.goatcounter.com; font-src 'self' data:; connect-src https://sn1k.goatcounter.com; base-uri 'none'; form-action 'none'; upgrade-insecure-requests">
+<link rel="alternate" type="application/atom+xml" title="sove.it Insights" href="https://www.sove-it.de/insights/feed.xml">
+<meta name="author" content="Nico Schäfer">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
 <meta name="description" content="Mundlak-Zerlegung in R: Within- und Between-Effekt in Paneldaten sauber trennen — mit plm, glmmTMB und produktiver Umsetzung. sove.it Methoden-Notizen.">
 <meta name="theme-color" content="#141414">
-<meta property="og:title" content="Mundlak-Zerlegung praktisch — sove.it Methoden-Notizen">
+<meta property="og:title" content="Mundlak-Zerlegung in R: Within- und Between-Effekt in Paneldaten trennen">
 <meta property="og:description" content="Within- und Between-Effekt in Paneldaten sauber trennen: R-Code, Grafik und produktive Umsetzung.">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://www.sove-it.de/insights/mundlak-zerlegung.html">
 <meta property="og:image" content="https://www.sove-it.de/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="sove.it — FROM DATA TO DECISIONS">
+<meta property="og:site_name" content="sove.it e.K.">
+<meta property="og:locale" content="de_DE">
+<meta property="article:published_time" content="2026-07-13">
+<meta property="article:modified_time" content="2026-08-03">
+<meta property="article:author" content="Nico Schäfer">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Mundlak-Zerlegung in R: Within- und Between-Effekt in Paneldaten trennen">
+<meta name="twitter:description" content="Within- und Between-Effekt in Paneldaten sauber trennen: R-Code, Grafik und produktive Umsetzung.">
+<meta name="twitter:image" content="https://www.sove-it.de/og-image.png">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23141414'/%3E%3Cg transform='translate(30,32)'%3E%3Crect y='10' width='5' height='26' fill='%23fff'/%3E%3Crect x='7' y='15' width='5' height='21' fill='%23fff'/%3E%3Crect x='14' width='5' height='36' fill='%23fff'/%3E%3Crect x='21' y='20' width='5' height='16' fill='%235BD61E'/%3E%3Crect x='28' y='5' width='5' height='31' fill='%23fff'/%3E%3Crect x='35' y='10' width='5' height='26' fill='%23fff'/%3E%3C/g%3E%3C/svg%3E">
 <link rel="canonical" href="https://www.sove-it.de/insights/mundlak-zerlegung.html">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BlogPosting","headline":"Mundlak-Zerlegung: Within- und Between-Effekt sauber trennen","datePublished":"2026-07-13","inLanguage":"de","author":{"@type":"Person","name":"Nico Schäfer","url":"https://www.sove-it.de/#profil","sameAs":["https://www.linkedin.com/in/nicosch%C3%A4fer/","https://github.com/sn1k23"]},"publisher":{"@type":"Organization","name":"sove.it e.K."},"mainEntityOfPage":"https://www.sove-it.de/insights/mundlak-zerlegung.html","keywords":"Mundlak, Paneldaten, plm, R, Wirkungsevaluation, Within-Effekt"}
+{"@context":"https://schema.org","@type":"BlogPosting",
+ "@id":"https://www.sove-it.de/insights/mundlak-zerlegung.html#post",
+ "headline":"Mundlak-Zerlegung in R: Within- und Between-Effekt in Paneldaten trennen",
+ "description":"Mundlak-Zerlegung in R: Within- und Between-Effekt in Paneldaten sauber trennen — mit plm, glmmTMB und produktiver Umsetzung.",
+ "datePublished":"2026-07-13",
+ "dateModified":"2026-08-03",
+ "inLanguage":"de",
+ "image":"https://www.sove-it.de/og-image.png",
+ "author":{"@type":"Person","name":"Nico Schäfer","url":"https://www.sove-it.de/#profil",
+   "jobTitle":"Statistiker & Data Scientist",
+   "sameAs":["https://www.linkedin.com/in/nicosch%C3%A4fer/","https://github.com/sn1k23"]},
+ "publisher":{"@type":"Organization","name":"sove.it e.K.","url":"https://www.sove-it.de/",
+   "logo":{"@type":"ImageObject","url":"https://www.sove-it.de/og-image.png"}},
+ "mainEntityOfPage":{"@type":"WebPage","@id":"https://www.sove-it.de/insights/mundlak-zerlegung.html"},
+ "isPartOf":{"@type":"Blog","@id":"https://www.sove-it.de/insights/#blog","name":"Methoden-Notizen","url":"https://www.sove-it.de/insights/"},
+ "articleSection":"Paneldaten & Kausalanalyse",
+ "keywords":"Mundlak-Zerlegung, Paneldaten, Within-Effekt, Between-Effekt, Random Effects, Fixed Effects, plm, glmmTMB, R, Panelökonometrie"}
 </script>
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Start","item":"https://www.sove-it.de/"},{"@type":"ListItem","position":2,"name":"Insights","item":"https://www.sove-it.de/insights/"},{"@type":"ListItem","position":3,"name":"Mundlak-Zerlegung","item":"https://www.sove-it.de/insights/mundlak-zerlegung.html"}]}
 </script>
-<title>Mundlak-Zerlegung praktisch — sove.it Methoden-Notizen</title>
+<title>Mundlak-Zerlegung in R: Within- und Between-Effekt in Paneldaten trennen</title>
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
   body{background:#141414;color:#C9C9C9;font:16px/1.7 Arial,Helvetica,sans-serif}
@@ -46,8 +77,9 @@
          padding:12px 20px;border-radius:6px;margin-top:8px}
   .cta a:hover{text-decoration:none;box-shadow:0 0 20px rgba(91,214,30,.4)}
   footer{border-top:1px solid #2a2a2a;margin-top:56px;padding:26px 0 60px;font:12px ui-monospace,Consolas,monospace;color:#5A5A5A}
-  .draftbar{background:#3a2a00;border-bottom:1px solid #5a4200;color:#f0c674;font:13px ui-monospace,Consolas,monospace;
-            text-align:center;padding:8px}
+  .kicker{font:13px/1.6 ui-monospace,Consolas,monospace;color:#767676;margin-bottom:18px}
+  .note{border-top:1px solid #2a2a2a;margin-top:40px;padding-top:18px;font:13px/1.6 ui-monospace,Consolas,monospace;color:#767676}
+  ul.quellen{list-style:none;padding:0;margin:0} ul.quellen li{font:13px/1.7 ui-monospace,Consolas,monospace;color:#767676;padding-left:18px;text-indent:-18px;margin-bottom:10px}
   @media(max-width:560px){h1{font-size:30px}.wrap{padding:0 18px}}
 </style>
 </head>
@@ -55,20 +87,23 @@
 <header><div class="wrap"><a href="/" style="color:inherit"><span class="logo">SOVE<span class="dot">.</span>IT</span></a> &nbsp;·&nbsp; <a href="/insights/" style="font:12px ui-monospace,Consolas,monospace;color:#767676">METHODEN-NOTIZEN</a></div></header>
 
 <article class="wrap">
-  <div class="eyebrow">PANELDATEN · KAUSALITÄT</div>
-  <h1>Mundlak-Zerlegung: Within- und Between-Effekt sauber trennen</h1>
+  <div class="eyebrow">PANELDATEN · KAUSALANALYSE</div>
+  <h1>Mundlak-Zerlegung in R: Within- und Between-Effekt in Paneldaten trennen</h1>
+  <div class="kicker">Methoden-Notizen — Verfahren, die eine Entscheidung tragen, mit der Prüfgröße, die dazugehört.</div>
   <div class="meta">13. Juli 2026 · ~7 Min · Nico Schäfer</div>
 
-  <p class="lead">Ein einfaches Random-Effects-Modell vermengt bei Paneldaten zwei analytisch zu trennende Fragestellungen: die Veränderung <em>innerhalb</em> einer Einheit über die Zeit einerseits, die Unterschiede <em>zwischen</em> den Einheiten andererseits. Die Mundlak-Korrektur trennt beide Varianzquellen — mit einer einzigen zusätzlichen Kovariate und ohne den Effizienzverlust eines reinen Fixed-Effects-Ansatzes.</p>
+  <p class="lead">Ein einfaches Random-Effects-Modell vermengt bei Paneldaten zwei analytisch zu trennende Fragestellungen: die Veränderung <em>innerhalb</em> einer Einheit über die Zeit einerseits, die Unterschiede <em>zwischen</em> den Einheiten andererseits. Die Mundlak-Korrektur trennt beide Varianzquellen — mit einer einzigen zusätzlichen Kovariate und ohne dass zeitkonstante Merkmale aus dem Modell fallen, wie es beim reinen Fixed-Effects-Ansatz der Fall ist.</p>
 
-  <h2>Das Problem an einem Beispiel</h2>
+  <h2>Das Problem: Random-Effects-Modelle vermischen Within- und Between-Variation</h2>
   <p>Modelliert sei die Häufigkeit von Streckenstörungen im Schienenverkehr als Funktion der Instandhaltungsintensität, beobachtet über mehrere Jahre je Streckenabschnitt (<code>strecke_id</code> × <code>jahr</code>). Zu klären ist, ob eine höhere Instandhaltungsintensität die Störungen senkt. Ein naives Random-Effects-Modell liefert hier einen Koeffizienten, der Within- und Between-Variation vermischt. Verzerrt ist dieser Schätzer immer dann, wenn stärker beanspruchte Strecken zugleich intensiver gewartet werden <em>und</em> häufiger stören: Die Selektion schlägt sich dann als vermeintlicher Effekt nieder.</p>
 
-  <h2>Das Verfahren in einem Satz</h2>
-  <p>In das Modell wird zusätzlich der <strong>Einheiten-Mittelwert</strong> jeder zeitveränderlichen Kovariate aufgenommen. Der ursprüngliche Koeffizient misst dann den reinen <strong>Within-Effekt</strong> — die Veränderung innerhalb einer Strecke —, der Koeffizient des Mittelwerts die <strong>Between-Korrektur</strong>. Fällt letzterer signifikant aus, war das naive RE-Modell verzerrt; insofern liefert die Zerlegung zugleich einen handlichen Hausman-Test.</p>
+  <h2>Die Mundlak-Zerlegung in einem Satz</h2>
+  <p>In das Modell wird zusätzlich der <strong>Einheiten-Mittelwert</strong> jeder zeitveränderlichen Kovariate aufgenommen. Der ursprüngliche Koeffizient misst dann den reinen <strong>Within-Effekt</strong> — die Veränderung innerhalb einer Strecke —, der Koeffizient des Mittelwerts die <strong>Between-Korrektur</strong>. Der Unterschied ist derselbe wie zwischen zwei Fragen an eine Belegschaft: Verdienen Beschäftigte in Abteilung A mehr als in Abteilung B? Und: Verdient dieselbe Person nach einer Fortbildung mehr als vorher? Die erste Frage vergleicht zwischen den Einheiten, die zweite innerhalb einer Einheit — und nur die zweite sagt etwas über Wirkung. Fällt die Between-Korrektur signifikant aus — bei mehreren zeitveränderlichen Kovariaten ist der gemeinsame Wald-Test auf alle Mittelwerte das richtige Kriterium —, dann unterscheiden sich Within- und Between-Steigung. Das ist der übliche Anlass, dem RE-Koeffizienten nicht als Wirkung zu trauen, und zugleich die Mundlak-Form des Hausman-Tests. Es ist nicht dasselbe wie ein Nachweis von Endogenität: Auch echte Heterogenität kann die beiden Steigungen auseinandertreiben, etwa wenn kurz- und langfristige Reaktionen verschieden ausfallen. Und ein nicht signifikanter Test ist kein Freibrief, sondern bei wenigen Einheiten häufig schlicht wenig Power. Zu beachten ist die Ablesung: In dieser Schreibweise ist der Koeffizient auf <code>instand_bar</code> die <em>Differenz</em> zwischen Between- und Within-Effekt, nicht der Between-Effekt selbst. Der Between-Effekt ergibt sich als Summe beider Koeffizienten. Wer ihn direkt ablesen will, zentriert die Kovariate:</p>
 
   <div class="filelabel">mundlak.R</div>
-<pre><span class="cmt"># Einheiten-Mittelwert der zeitveränderlichen Kovariate</span>
+<pre><span class="fn">library</span>(dplyr)
+
+<span class="cmt"># Einheiten-Mittelwert der zeitveränderlichen Kovariate</span>
 d &lt;- d |&gt; <span class="fn">group_by</span>(strecke_id) |&gt;
        <span class="fn">mutate</span>(instand_bar = <span class="fn">mean</span>(instandhaltung)) |&gt; <span class="fn">ungroup</span>()
 
@@ -78,53 +113,101 @@ m &lt;- <span class="fn">plm</span>(stoerungen ~ instandhaltung + instand_bar,
          data = d, index = <span class="fn">c</span>(<span style="color:#c98">"strecke_id"</span>, <span style="color:#c98">"jahr"</span>),
          model = <span style="color:#c98">"random"</span>)
 
-<span class="fn">library</span>(lmtest)
-<span class="fn">coeftest</span>(m)   <span class="cmt"># instand_bar signifikant  =&gt;  RE war verzerrt</span></pre>
+<span class="fn">library</span>(lmtest); <span class="fn">library</span>(sandwich)
+<span class="fn">coeftest</span>(m, vcov. = <span class="fn">vcovHC</span>(m, method = <span style="color:#c98">"arellano"</span>,
+                             type = <span style="color:#c98">"HC3"</span>, cluster = <span style="color:#c98">"group"</span>))
+<span class="cmt"># geclustert auf strecke_id; instand_bar signifikant =&gt; Within ≠ Between</span>
 
-  <p>Der Koeffizient auf <code>instandhaltung</code> entspricht nun dem Within-Effekt und ist numerisch identisch mit dem Fixed-Effects-Schätzer, verbleibt jedoch im RE-Rahmen, sodass zeitkonstante Merkmale wie Streckentyp oder Region im Modell erhalten bleiben. Der Koeffizient auf <code>instand_bar</code> bindet exakt jene Selektion, die den naiven Schätzer verzerrt hätte.</p>
+<span class="cmt"># Hybrid-/REWB-Schreibweise: beide Effekte direkt ablesbar</span>
+d &lt;- d |&gt; <span class="fn">mutate</span>(instand_dev = instandhaltung - instand_bar)
+m_hyb &lt;- <span class="fn">plm</span>(stoerungen ~ instand_dev + instand_bar,
+             data = d, index = <span class="fn">c</span>(<span style="color:#c98">"strecke_id"</span>, <span style="color:#c98">"jahr"</span>),
+             model = <span style="color:#c98">"random"</span>)
+<span class="cmt"># instand_dev = Within-Effekt, instand_bar = Between-Effekt</span></pre>
+
+  <p>Der Koeffizient auf <code>instandhaltung</code> ist damit der reine Within-Effekt; im balancierten Panel stimmt er numerisch mit dem Fixed-Effects-Schätzer überein. Das hier gerechnete Beispiel ist ein balanciertes Panel — 60 Streckenabschnitte × 8 Jahre, 480 Beobachtungen —, und dort unterscheiden sich die beiden Schätzer um 1,2e−15. Der Gewinn liegt nicht in höherer Präzision dieses Koeffizienten, sondern darin, dass zeitkonstante Merkmale wie Streckentyp oder Region im Modell erhalten bleiben. Deren Koeffizienten sind allerdings als deskriptive Between-Vergleiche zu lesen, nicht als Wirkungen: Die Mundlak-Korrektur bindet nur den Teil des Streckeneffekts, der linear auf den Kovariaten-Mittelwerten liegt — der Rest bleibt mit ihnen konfundiert. Der Koeffizient auf <code>instand_bar</code> bindet jene Selektion, die den naiven Schätzer verzerrt hätte — die zeitkonstanten Unterschiede zwischen den Strecken. Selektion, die sich über die Zeit verändert, bleibt davon unberührt.</p>
+
+  <p>Der Gruppenmittelwert muss über genau die Beobachtungen laufen, die anschließend auch geschätzt werden — im Beispiel oben ist das Panel vollständig. Liegen fehlende Werte vor, gehört die Beschränkung auf vollständige Fälle vor die Mittelwertbildung; ein nachträgliches Wegrechnen der fehlenden Werte in <code>mean()</code> zerstört die Mundlak-Eigenschaft, weil der Mittelwert dann über mehr Zeilen gebildet wird als in die Schätzung eingehen.</p>
+
+  <p>Eine Annahme bleibt und wird durch die Zerlegung nicht erledigt: strikte Exogenität. Der Within-Effekt ist nur dann als Wirkung lesbar, wenn die Instandhaltung eines Jahres nicht selbst auf die Störungen früherer oder späterer Jahre reagiert und keine zeitveränderliche Größe beides zugleich treibt. Gerade bei Instandhaltung ist die Rückkopplung plausibel — nach einem Störungsjahr wird mehr gewartet. Wo das zu erwarten ist, gehört die Zeitstruktur ins Modell (Lags, dynamische Panelschätzer) oder die Formulierung heißt „Zusammenhang innerhalb einer Strecke" statt „Wirkung".</p>
 
   <figure>
-  <svg viewBox="0 0 700 300" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;background:#191919;border:1px solid #2a2a2a;border-radius:8px">
+  <svg viewBox="0 0 700 300" role="img" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;background:#191919;border:1px solid #2a2a2a;border-radius:8px">
+    <title>Rohvergleich zwischen Strecken gegen Within-Zerlegung innerhalb einer Strecke</title>
     <text x="24" y="30" fill="#767676" font-family="ui-monospace,Consolas,monospace" font-size="12">effekt-zerlegung</text>
     <!-- Between (grau, positiv, irreführend) -->
     <line x1="70" y1="240" x2="330" y2="90" stroke="#5A5A5A" stroke-width="2"/>
     <circle cx="110" cy="210" r="4" fill="#5A5A5A"/><circle cx="170" cy="185" r="4" fill="#5A5A5A"/>
     <circle cx="240" cy="140" r="4" fill="#5A5A5A"/><circle cx="300" cy="105" r="4" fill="#5A5A5A"/>
-    <text x="150" y="80" fill="#5A5A5A" font-family="ui-monospace,Consolas,monospace" font-size="12">between (roh): +0.31</text>
+    <text x="150" y="80" fill="#5A5A5A" font-family="ui-monospace,Consolas,monospace" font-size="12">between (roh): +0,37</text>
     <!-- Within (grün, negativ, kausal) -->
     <line x1="400" y1="110" x2="650" y2="230" stroke="#5BD61E" stroke-width="2.5"/>
     <circle cx="430" cy="128" r="4" fill="#5BD61E"/><circle cx="500" cy="160" r="4" fill="#5BD61E"/>
     <circle cx="560" cy="192" r="4" fill="#5BD61E"/><circle cx="620" cy="220" r="4" fill="#5BD61E"/>
-    <text x="410" y="100" fill="#5BD61E" font-family="ui-monospace,Consolas,monospace" font-size="12">within (mundlak): &minus;0.22</text>
-    <text x="24" y="285" fill="#767676" font-family="ui-monospace,Consolas,monospace" font-size="11">links: unterschiedliche strecken &nbsp;·&nbsp; rechts: veränderung innerhalb einer strecke</text>
+    <text x="410" y="100" fill="#5BD61E" font-family="ui-monospace,Consolas,monospace" font-size="12">within (mundlak): &minus;0,21</text>
+    <text x="360" y="268" text-anchor="middle" fill="#767676" font-family="ui-monospace,Consolas,monospace" font-size="11">x: instandhaltungsintensität</text>
+    <text x="16" y="150" text-anchor="middle" transform="rotate(-90 16 150)" fill="#767676" font-family="ui-monospace,Consolas,monospace" font-size="11">y: störungen je jahr</text>
+    <text x="40" y="290" fill="#767676" font-family="ui-monospace,Consolas,monospace" font-size="11">links: unterschiedliche strecken &nbsp;·&nbsp; rechts: veränderung innerhalb einer strecke</text>
   </svg>
-  <figcaption>Between-Signal (grau) zeigt fälschlich einen positiven Zusammenhang — nur die Within-Zerlegung (grün) misst die Wirkung der Instandhaltung.</figcaption>
+  <figcaption>Das Between-Signal (grau) ist real, als Wirkungsaussage aber irreführend — nur die Within-Zerlegung (grün) zeigt den Zusammenhang innerhalb derselben Strecke, unter strikter Exogenität als Wirkung der Instandhaltung lesbar.</figcaption>
   </figure>
 
-  <h2>Erweiterung auf Zähldaten</h2>
-  <p>Das lineare Modell bildet die Mechanik am klarsten ab. Streckenstörungen sind jedoch Zähldaten und häufig überdispers; methodisch gehört die Mundlak-Korrektur daher in ein (Quasi-)Poisson- bzw. negativ-binomiales Modell mit zufälligem Streckenintercept. Das Prinzip bleibt identisch, lediglich die Verteilungsannahme ändert sich:</p>
+  <h2>Mundlak-Korrektur für Zähldaten: negativ-binomiales Panelmodell mit glmmTMB</h2>
+  <p>Das lineare Modell bildet die Mechanik am klarsten ab. Streckenstörungen sind jedoch Zähldaten und häufig überdispers; methodisch gehört die Mundlak-Korrektur daher in ein Zähldatenmodell mit zufälligem Streckenintercept. Die Wahl der Varianzfunktion ist dabei keine Formsache: <code>nbinom2</code> unterstellt Var = μ + μ²/θ, <code>nbinom1</code> dagegen Var = φμ — Letzteres ist das Mixed-Model-Analogon zur Quasi-Poisson-Schätzung, die selbst keine Likelihood besitzt und in <code>glmmTMB</code> nicht zur Verfügung steht. Beide gewichten große und kleine Erwartungswerte unterschiedlich. Die Zerlegung funktioniert unverändert — hinzu kommen die Verteilungsannahme und die Voraussetzung, dass der Streckeneffekt mit dem Gruppenmittelwert linear zusammenhängt. Die exakte Übereinstimmung mit dem Fixed-Effects-Schätzer gilt nur im linearen Fall:</p>
 
   <div class="filelabel">mundlak_count.R</div>
 <pre><span class="fn">library</span>(glmmTMB)
-mc &lt;- <span class="fn">glmmTMB</span>(stoerungen ~ instandhaltung + instand_bar + (1 | strecke_id),
-             family = <span class="fn">nbinom2</span>, data = d)   <span class="cmt"># Overdispersion abgedeckt</span></pre>
+mc &lt;- <span class="fn">glmmTMB</span>(stoerungen ~ instandhaltung + instand_bar +
+                <span class="fn">offset</span>(<span class="fn">log</span>(laenge_km)) + (1 | strecke_id),
+              family = <span class="fn">nbinom2</span>, data = d)   <span class="cmt"># Overdispersion abgedeckt</span></pre>
+
+  <p><code>laenge_km</code> ist die Länge des Streckenabschnitts. Der Offset darauf gehört dazu, weil Störungen eine Zählung sind, die mit der Länge des Abschnitts mitwächst: Ohne ihn schätzt das Modell Störungen je Abschnitt statt Störungen je Kilometer. Ob er die Koeffizienten tatsächlich verschiebt, hängt davon ab, ob die Länge mit der Instandhaltungsintensität zusammenhängt — im hier gerechneten Beispiel ist sie unabhängig gezogen, dort bliebe das Weglassen folgenlos. In echten Netzdaten ist das selten so. Zu beachten ist außerdem, dass ein Offset einen Koeffizienten von exakt 1 unterstellt; wer das nicht voraussetzen will, nimmt <code>log(laenge_km)</code> als Kovariate auf und testet gegen 1. Im gerechneten Beispiel liegt der Within-Koeffizient bei &minus;0,135 (SE 0,052), die Between-Korrektur bei +0,328 — dieselbe Trennung wie im linearen Fall, auf der Log-Rate-Skala.</p>
+
+  <p>Was das Modell in dieser Form noch nicht enthält, sind Zeiteffekte. Gemeinsame Schocks — ein Witterungsjahr, eine Regelwerksänderung — treffen alle Strecken zugleich und gehen sonst in den Within-Effekt ein. Jahresdummies gehören deshalb in aller Regel dazu.</p>
 
   <div class="callout">
-    <div class="t">SO NUTZEN WIR DAS PRODUKTIV</div>
-    <p style="margin:0">In Kundenprojekten läuft die Zerlegung nicht als Einzelskript, sondern als reproduzierbarer <code>targets</code>-Schritt: Rohdaten → Panel bauen → Mundlak-Modell → automatischer Quarto-Report mit Koeffizienten-Tabelle und dieser Grafik. Neue Datenlieferung, ein Befehl, aktualisierter Bericht — die Methodik bleibt prüfbar, das Ergebnis landet ohne Handarbeit im Postfach der Fachabteilung.</p>
+    <div class="t">SO GEHT DAS IN DEN BETRIEB</div>
+    <p style="margin:0">In produktiven Aufbauten läuft die Zerlegung nicht als Einzelskript, sondern als reproduzierbarer Schritt einer Auswertungsstrecke (<a href="/#leistungen">automatisiertes Reporting und reproduzierbare Pipelines</a>): Rohdaten → Panel bauen → Mundlak-Modell → automatischer Quarto-Report mit Koeffizienten-Tabelle und dieser Grafik. Neue Datenlieferung, ein Befehl, aktualisierter Bericht — die Methodik bleibt prüfbar, das Ergebnis landet ohne Handarbeit im Postfach der Fachabteilung.</p>
   </div>
 
-  <h2>Fazit</h2>
-  <p>Die Mundlak-Zerlegung kostet eine Zeile Code und beantwortet die Frage, an der naive Panelmodelle scheitern: Was ist Wirkung, was ist Selektion? Wer Effekte berichtet, ohne beide Varianzquellen getrennt zu haben, berichtet im Zweifel das Falsche.</p>
+  <p>Für die Fachabteilung ändert das die Aussage, nicht nur die Methode: Der Rohvergleich zwischen Strecken legt nahe, dass mehr Instandhaltung mit mehr Störungen einhergeht — innerhalb derselben Strecke betrachtet senkt sie die Störungen. Das ist der Unterschied zwischen der Empfehlung, das Instandhaltungsbudget zu kürzen, und der Empfehlung, es zu halten.</p>
+
+  <h2>Fazit: Within-Effekt berichten, Between-Korrektur ausweisen</h2>
+  <p>Die Mundlak-Zerlegung kostet je zeitveränderlicher Kovariate eine Zeile Code und beantwortet die Frage, an der naive Panelmodelle scheitern: Was ist Wirkung, was ist Selektion? Wer Effekte berichtet, ohne beide Varianzquellen getrennt zu haben, berichtet im Zweifel das Falsche.</p>
+
+  <h2>Drei Anlässe für ein Gespräch über Paneldaten</h2>
+  <ul>
+    <li>Eine Kennzahl wird je Einheit über mehrere Jahre geführt — Störungen je Streckenabschnitt, Fälle je Standort, Kosten je Vertrag — und der Vergleich zwischen den Einheiten soll in eine Steuerungsentscheidung münden. Dann ist zu trennen, was Wirkung ist und was Ausgangslage.</li>
+    <li>Eine Maßnahme wird evaluiert, in die sich die Einheiten nicht zufällig hineinbewegt haben: Wer stärker beansprucht ist, bekommt mehr Maßnahme. In einem Ex-post-Design mit Treatment- und Vergleichsgruppe schlägt diese Selektion sonst als vermeintlicher Effekt durch.</li>
+    <li>Eine Auswertung läuft über fortlaufende Erhebungswellen und wird bei jeder Lieferung neu gerechnet. Springt ein Koeffizient zwischen den Wellen, ist zuerst zu klären, ob sich die Wirkung geändert hat oder die Zusammensetzung der Einheiten.</li>
+  </ul>
+
+  <div class="callout">
+    <div class="eyebrow">AUS DERSELBEN REIHE</div>
+    <p style="margin:0"><a href="/insights/conformal-prediction-xgboost.html">Vorhersageintervalle für XGBoost-Prognosen: Conformal Prediction in R</a> — wie sich Prognoseunsicherheit mit nachprüfbarer Überdeckung ausweisen lässt.</p>
+  </div>
 
   <div class="cta">
     <div style="font:600 12px ui-monospace,Consolas,monospace;letter-spacing:.1em;color:#5BD61E;margin-bottom:8px">ÄHNLICHE FRAGESTELLUNG?</div>
-    <p style="margin:0 0 4px">Paneldaten, Wirkungsevaluation oder ein Modell, das produktiv laufen soll — im 15-minütigen Erstgespräch klären wir den kürzesten Weg zur belastbaren Antwort.</p>
+    <p style="margin:0 0 4px">Paneldaten, Wirkungsevaluation oder ein Modell, das produktiv laufen soll — im 15-minütigen Erstgespräch kläre ich den kürzesten Weg zur belastbaren Antwort.</p>
     <a href="https://cal.com/nico-schafer-xmc3xr/erstgesprach" target="_blank" rel="noopener">15-MIN-TERMIN BUCHEN →</a>
+    <p style="margin:10px 0 0;font-size:15px">Mehr dazu, wie Panel- und Mixed-Models, Kausalanalyse und Wirkungsevaluation im Projekt zusammenkommen: <a href="/#leistungen">Leistungen von sove.it im Überblick</a>.</p>
   </div>
+
+  <p class="note">Die Koeffizienten +0,37 (rohe Between-Beziehung) und &minus;0,21 (Within-Effekt) stammen aus einem tatsächlich gelaufenen Beispiel mit simulierten Paneldaten — keine Projektergebnisse und keine illustrativen Koeffizienten. Der Datenerzeugungsprozess ist so gewählt, dass stärker beanspruchte Strecken intensiver gewartet werden und häufiger stören; das Panel ist balanciert mit 60 Strecken × 8 Jahren, <code>set.seed(42)</code>, gerechnet unter R 4.3.3 mit plm 2.6.3 und glmmTMB 1.1.8. Die Standardfehler der linearen Panelmodelle sind cluster-robust nach Arellano (HC3, geclustert auf <code>strecke_id</code>); der ausgewiesene SE 0,052 des Zähldatenmodells stammt aus <code>glmmTMB</code> und ist modellbasiert. Das vollständige Skript steht unter <a href="/insights/code/mundlak-zerlegung.R">mundlak-zerlegung.R</a>; alle im Beitrag genannten Zahlen stammen aus diesem Lauf.</p>
+
+  <h2>Quellen</h2>
+  <ul class="quellen">
+    <li>Mundlak, Y. (1978): On the Pooling of Time Series and Cross Section Data. <em>Econometrica</em> 46(1), 69–85.</li>
+    <li>Bell, A. &amp; Jones, K. (2015): Explaining Fixed Effects: Random Effects Modeling of Time-Series Cross-Sectional and Panel Data. <em>Political Science Research and Methods</em> 3(1), 133–153.</li>
+    <li>Wooldridge, J. M. (2010): <em>Econometric Analysis of Cross Section and Panel Data.</em> 2. Aufl., MIT Press, Kap. 10.</li>
+    <li>Hausman, J. A. (1978): Specification Tests in Econometrics. <em>Econometrica</em> 46(6), 1251–1271.</li>
+    <li>Brooks, M. E. et al. (2017): glmmTMB Balances Speed and Flexibility Among Packages for Zero-inflated Generalized Linear Mixed Modeling. <em>The R Journal</em> 9(2), 378–400.</li>
+  </ul>
 </article>
 
-<footer><div class="wrap">© 2026 sove.it e.K. · FROM DATA TO DECISIONS &nbsp;·&nbsp; Methoden-Notizen erscheinen wöchentlich.</div></footer>
+<footer><div class="wrap">© 2026 sove.it e.K. · FROM DATA TO DECISIONS &nbsp;·&nbsp; Methoden-Notizen erscheinen alle zwei Wochen.
+<div class="meta" style="margin:8px 0 0"><a href="/insights/feed.xml">Feed abonnieren</a></div></div></footer>
 <script data-goatcounter="https://sn1k.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>

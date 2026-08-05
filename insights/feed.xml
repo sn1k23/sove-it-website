@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="de">
+  <title>sove.it — Methoden-Notizen</title>
+  <subtitle>Statistik, R und produktive Datenanalyse — ein Verfahren je Beitrag, mit lauffähigem Code und der Prüfgröße, die dazugehört.</subtitle>
+  <link href="https://www.sove-it.de/insights/feed.xml" rel="self" type="application/atom+xml"/>
+  <link href="https://www.sove-it.de/insights/" rel="alternate" type="text/html"/>
+  <id>https://www.sove-it.de/insights/</id>
+  <updated>2026-07-30T00:00:00+02:00</updated>
+  <author><name>Nico Schäfer</name><uri>https://www.sove-it.de/#profil</uri></author>
+  <rights>© 2026 sove.it e.K.</rights>
+
+  <entry>
+    <title>Vorhersageintervalle für XGBoost-Prognosen: Conformal Prediction in R</title>
+    <link href="https://www.sove-it.de/insights/conformal-prediction-xgboost.html" rel="alternate" type="text/html"/>
+    <id>https://www.sove-it.de/insights/conformal-prediction-xgboost.html</id>
+    <published>2026-07-30T00:00:00+02:00</published>
+    <updated>2026-07-30T00:00:00+02:00</updated>
+    <category term="Prognose &amp; Unsicherheit"/>
+    <summary type="text">Ein Punktwert sagt nicht, wie sicher er ist. Achtzehn Zeilen R liefern ein Vorhersageintervall mit nachprüfbarer Überdeckung — mit Kalibrierquantil, Überdeckungsprüfung je Gruppe und einseitiger Alarmregel.</summary>
+  </entry>
+
+  <entry>
+    <title>Mundlak-Zerlegung in R: Within- und Between-Effekt in Paneldaten trennen</title>
+    <link href="https://www.sove-it.de/insights/mundlak-zerlegung.html" rel="alternate" type="text/html"/>
+    <id>https://www.sove-it.de/insights/mundlak-zerlegung.html</id>
+    <published>2026-07-13T00:00:00+02:00</published>
+    <updated>2026-07-13T00:00:00+02:00</updated>
+    <category term="Paneldaten &amp; Kausalanalyse"/>
+    <summary type="text">Warum naive Panelmodelle Wirkung und Selektion vermischen — und wie eine einzige Zusatzvariable beides trennt. Mit plm, glmmTMB und produktiver Umsetzung.</summary>
+  </entry>
+</feed>

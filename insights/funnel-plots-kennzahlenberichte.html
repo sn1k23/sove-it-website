@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' https://gc.zgo.at; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://sn1k.goatcounter.com; font-src 'self' data:; connect-src https://sn1k.goatcounter.com; base-uri 'none'; form-action 'none'; upgrade-insecure-requests">
+<link rel="alternate" type="application/atom+xml" title="sove.it Insights" href="https://www.sove-it.de/insights/feed.xml">
+<meta name="author" content="Nico Schäfer">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+<meta name="description" content="Funnel Plots in R statt fester Schwellenwerte: fallzahlabhängige Kontrollgrenzen für automatisierte Kennzahlenberichte, mit Overdispersion-Korrektur, gerechnetem Vergleich und dem Preis an Trennschärfe.">
+<meta name="theme-color" content="#141414">
+<meta property="og:title" content="Kennzahlenberichte in R automatisieren: Funnel Plots statt fester Schwellenwerte">
+<meta property="og:description" content="Ein fester Referenzwert erzeugt im Beispiel 2,05 Fehlalarme je Bericht, fallzahlabhängige Grenzen 0,16. Fast neun von zehn treffen die kleinen Einheiten.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://www.sove-it.de/insights/funnel-plots-kennzahlenberichte.html">
+<meta property="og:image" content="https://www.sove-it.de/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="sove.it · FROM DATA TO DECISIONS">
+<meta property="og:site_name" content="sove.it e.K.">
+<meta property="og:locale" content="de_DE">
+<meta property="article:published_time" content="2026-09-10">
+<meta property="article:modified_time" content="2026-09-10">
+<meta property="article:author" content="Nico Schäfer">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Kennzahlenberichte in R automatisieren: Funnel Plots statt fester Schwellenwerte">
+<meta name="twitter:description" content="Fallzahlabhängige Kontrollgrenzen kosten rund zwanzig Zeilen R und senken die Fehlalarme um den Faktor 12,9.">
+<meta name="twitter:image" content="https://www.sove-it.de/og-image.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23141414'/%3E%3Cg transform='translate(30,32)'%3E%3Crect y='10' width='5' height='26' fill='%23fff'/%3E%3Crect x='7' y='15' width='5' height='21' fill='%23fff'/%3E%3Crect x='14' width='5' height='36' fill='%23fff'/%3E%3Crect x='21' y='20' width='5' height='16' fill='%235BD61E'/%3E%3Crect x='28' y='5' width='5' height='31' fill='%23fff'/%3E%3Crect x='35' y='10' width='5' height='26' fill='%23fff'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="canonical" href="https://www.sove-it.de/insights/funnel-plots-kennzahlenberichte.html">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting",
+ "@id":"https://www.sove-it.de/insights/funnel-plots-kennzahlenberichte.html#post",
+ "headline":"Kennzahlenberichte in R automatisieren: Funnel Plots statt fester Schwellenwerte",
+ "description":"Fallzahlabhängige Kontrollgrenzen für automatisierte Kennzahlenberichte in R: Funnel Plots mit Overdispersion-Korrektur, gerechneter Vergleich gegen den festen Schwellenwert und der Preis an Trennschärfe.",
+ "datePublished":"2026-09-10",
+ "dateModified":"2026-09-10",
+ "inLanguage":"de",
+ "image":"https://www.sove-it.de/og-image.png",
+ "author":{"@type":"Person","name":"Nico Schäfer","url":"https://www.sove-it.de/#profil",
+   "jobTitle":"Statistiker & Data Scientist",
+   "sameAs":["https://www.linkedin.com/in/nicosch%C3%A4fer/","https://github.com/sn1k23"]},
+ "publisher":{"@type":"Organization","name":"sove.it e.K.","url":"https://www.sove-it.de/",
+   "logo":{"@type":"ImageObject","url":"https://www.sove-it.de/og-image.png"}},
+ "mainEntityOfPage":{"@type":"WebPage","@id":"https://www.sove-it.de/insights/funnel-plots-kennzahlenberichte.html"},
+ "isPartOf":{"@type":"Blog","@id":"https://www.sove-it.de/insights/#blog","name":"Methoden-Notizen","url":"https://www.sove-it.de/insights/"},
+ "articleSection":"Kennzahlen & Qualitätssicherung",
+ "keywords":"Funnel Plot, Kennzahlenbericht, Qualitätssicherung, Kontrollgrenzen, Overdispersion, Spiegelhalter, Einrichtungsvergleich, automatisiertes Reporting, officedown, R"}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Start","item":"https://www.sove-it.de/"},{"@type":"ListItem","position":2,"name":"Insights","item":"https://www.sove-it.de/insights/"},{"@type":"ListItem","position":3,"name":"Funnel Plots","item":"https://www.sove-it.de/insights/funnel-plots-kennzahlenberichte.html"}]}
+</script>
+<title>Kennzahlenberichte in R automatisieren: Funnel Plots statt fester Schwellenwerte</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#141414;color:#C9C9C9;font:16px/1.7 Arial,Helvetica,sans-serif}
+  a{color:#5BD61E;text-decoration:none} a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 24px}
+  header{border-bottom:1px solid #2a2a2a;padding:22px 0;margin-bottom:44px}
+  .logo{font:700 15px ui-monospace,Consolas,monospace;color:#fff;letter-spacing:.12em}
+  .logo .dot{color:#5BD61E}
+  .eyebrow{font:600 12px ui-monospace,Consolas,monospace;letter-spacing:.28em;color:#5BD61E;margin-bottom:16px}
+  h1{font:700 40px/1.15 ui-monospace,Consolas,monospace;color:#fff;margin-bottom:10px;letter-spacing:-.01em}
+  .kicker{font:13px/1.6 ui-monospace,Consolas,monospace;color:#767676;margin-bottom:18px}
+  .meta{font:13px ui-monospace,Consolas,monospace;color:#767676;margin-bottom:40px}
+  h2{font:700 22px ui-monospace,Consolas,monospace;color:#fff;margin:40px 0 14px}
+  p{margin-bottom:18px} .lead{font-size:18px;color:#e6e6e6}
+  ul{margin:0 0 18px 22px} li{margin-bottom:8px}
+  code{font-family:ui-monospace,Consolas,monospace;color:#8fe36a;font-size:.92em}
+  pre{background:#191919;border:1px solid #2a2a2a;border-radius:8px;padding:18px 20px;overflow-x:auto;margin:22px 0;
+      font:13px/1.6 ui-monospace,Consolas,monospace;color:#dcdcdc}
+  pre .cmt{color:#767676} pre .fn{color:#5BD61E}
+  .filelabel{font:600 12px ui-monospace,Consolas,monospace;color:#767676;margin:22px 0 -12px}
+  .callout{border-left:3px solid #5BD61E;background:#191919;padding:16px 20px;margin:26px 0;border-radius:0 8px 8px 0}
+  .callout .t{font:600 12px ui-monospace,Consolas,monospace;letter-spacing:.1em;color:#5BD61E;margin-bottom:8px}
+  .tldr{border:1px solid #2a2a2a;background:#191919;border-radius:8px;padding:18px 22px;margin:0 0 32px}
+  .tldr .t{font:600 12px ui-monospace,Consolas,monospace;letter-spacing:.1em;color:#5BD61E;margin-bottom:10px}
+  .tldr ul{margin:0;padding-left:20px} .tldr li{margin-bottom:7px;font-size:15px}
+  .tldr li:last-child{margin-bottom:0}
+  figure{margin:28px 0} figcaption{font:12px ui-monospace,Consolas,monospace;color:#767676;margin-top:10px;text-align:center}
+  table{border-collapse:collapse;width:100%;margin:22px 0;font:13.5px/1.5 ui-monospace,Consolas,monospace}
+  th,td{border-bottom:1px solid #2a2a2a;padding:9px 10px;text-align:left}
+  th{color:#fff;font-weight:600} td{color:#C9C9C9}
+  .cta{border:1px solid #2a2a2a;border-radius:10px;padding:24px;margin:48px 0;background:#191919}
+  .cta a{display:inline-block;background:#5BD61E;color:#141414;font:600 13px ui-monospace,Consolas,monospace;
+         padding:12px 20px;border-radius:6px;margin-top:8px}
+  .cta a:hover{text-decoration:none;box-shadow:0 0 20px rgba(91,214,30,.4)}
+  .note{border-top:1px solid #2a2a2a;margin-top:40px;padding-top:18px;font:13px/1.6 ui-monospace,Consolas,monospace;color:#767676}
+  ul.quellen{list-style:none;padding:0;margin:0} ul.quellen li{font:13px/1.7 ui-monospace,Consolas,monospace;color:#767676;padding-left:18px;text-indent:-18px;margin-bottom:10px}
+  footer{border-top:1px solid #2a2a2a;margin-top:56px;padding:26px 0 60px;font:12px ui-monospace,Consolas,monospace;color:#5A5A5A}
+  @media(max-width:560px){h1{font-size:30px}.wrap{padding:0 18px}}
+</style>
+</head>
+<body>
+<header><div class="wrap"><a href="/" style="color:inherit"><span class="logo">SOVE<span class="dot">.</span>IT</span></a> &nbsp;·&nbsp; <a href="/insights/" style="font:12px ui-monospace,Consolas,monospace;color:#767676">METHODEN-NOTIZEN</a></div></header>
+
+<article class="wrap">
+  <div class="eyebrow">KENNZAHLEN · QUALITÄTSSICHERUNG · R</div>
+  <h1>Kennzahlenberichte in R automatisieren: Funnel Plots statt fester Schwellenwerte</h1>
+  <div class="kicker">Methoden-Notizen. Verfahren, die eine Entscheidung tragen, mit der Prüfgröße, die dazugehört.</div>
+  <div class="meta">10. September 2026 · ~10 Min · Nico Schäfer</div>
+
+  <div class="tldr">
+    <div class="t">ZIELSTELLUNG UND ERGEBNIS</div>
+    <ul>
+      <li><strong>Gegeben:</strong> Ein monatlicher Kennzahlenbericht vergleicht 50 Einheiten sehr unterschiedlicher Größe (25 bis 1.213 Fälle) gegen einen Referenzwert. Auffällige Einheiten gehen in ein Gespräch.</li>
+      <li><strong>Problem:</strong> Die Bewertungszeile <code>auffaellig = ergebnis &lt; referenz</code> behandelt eine Einheit mit 30 Fällen wie eine mit 900, obwohl die erste naturgemäß stärker streut.</li>
+      <li><strong>Verfahren:</strong> Funnel Plot mit fallzahlabhängigen Kontrollgrenzen nach Spiegelhalter, z&nbsp;=&nbsp;3,09, additive Overdispersion-Korrektur φ mit Winsorisierung bei 10/90 Prozent.</li>
+      <li><strong>Ergebnis im Beispiel:</strong> 2,050 Fehlalarme je Bericht gegen 0,159, also Faktor 12,9. Beim festen Wert treffen 87,6 Prozent der Fehlalarme die kleinere Hälfte der Einheiten.</li>
+      <li><strong>Preis:</strong> Die gefundenen echten Ausreißer gehen von 1,926 auf 1,552 zurück, ein Verlust von 19 Prozent Trefferquote.</li>
+    </ul>
+  </div>
+
+  <p class="lead">Automatisierung skaliert den Bericht und den methodischen Fehler darin gleich mit. Ein fester Referenzwert erzeugt im simulierten Beispiel 2,05 Fehlalarme je Bericht, fallzahlabhängige Grenzen 0,16. Fast neun von zehn dieser Fehlalarme treffen Einheiten aus der kleineren Hälfte.</p>
+
+  <h2>Das Praxisproblem</h2>
+  <p>Ein monatlich automatisch laufender Kennzahlenbericht spart Handarbeit, Copy-Paste-Fehler und Formatdiskussionen. Genau deshalb liest ihn irgendwann niemand mehr gegen.</p>
+  <p>Und irgendwo in diesem Bericht steht eine Zeile wie diese:</p>
+
+<pre>auffaellig &lt;- ergebnis &lt; referenz</pre>
+
+  <p>Sie ist schnell geschrieben und sofort erklärbar. Sie hat nur einen Nachteil: Sie behandelt eine Einheit mit 30 Fällen genauso wie eine mit 900.</p>
+  <p>Das ist keine Feinheit. Wenn die wahre Qualität einer Einheit bei 0,86 liegt und der Referenzwert bei 0,80, dann rutscht eine Einheit mit 30 Fällen allein durch Zufall mit Wahrscheinlichkeit 0,117 unter die Marke. Bei 900 Fällen passiert das praktisch nie:</p>
+
+<pre><span class="fn">library</span>(dplyr)
+
+<span class="fn">tibble</span>(n = <span class="fn">c</span>(30, 60, 120, 300, 900)) |&gt;
+  <span class="fn">mutate</span>(p_fehlalarm = <span class="fn">pbinom</span>(<span class="fn">ceiling</span>(0.80 * n) - 1, n, 0.86))</pre>
+
+  <table>
+    <tr><th>Fallzahl n</th><th>30</th><th>60</th><th>120</th><th>300</th><th>900</th></tr>
+    <tr><td>P(fälschlich auffällig)</td><td>0,117</td><td>0,069</td><td>0,026</td><td>0,002</td><td>0,000</td></tr>
+  </table>
+  <p style="font-size:14px;color:#767676;margin-top:-8px">binomial, wahre Qualität 0,86, Referenzwert 0,80</p>
+
+  <figure>
+  <svg viewBox="0 0 700 300" xmlns="http://www.w3.org/2000/svg" role="img" style="width:100%;display:block;background:#191919;border:1px solid #2a2a2a;border-radius:8px">
+<title>Wahrscheinlichkeit einer fälschlichen Auffälligkeit in Abhängigkeit von der Fallzahl</title>
+<text x="24" y="28" fill="#767676" font-family="ui-monospace,Consolas,monospace" font-size="12">p(faelschlich auffaellig) bei wahrer qualitaet 0.86, referenzwert 0.80</text>
+<line x1="70" y1="240" x2="676" y2="240" stroke="#2a2a2a" stroke-width="1"/>
+<text x="62" y="244" fill="#5A5A5A" font-family="ui-monospace,Consolas,monospace" font-size="10" text-anchor="end">0.00</text>
+<line x1="70" y1="180" x2="676" y2="180" stroke="#2a2a2a" stroke-width="1"/>
+<text x="62" y="184" fill="#5A5A5A" font-family="ui-monospace,Consolas,monospace" font-size="10" text-anchor="end">0.03</text>
+<line x1="70" y1="120" x2="676" y2="120" stroke="#2a2a2a" stroke-width="1"/>
+<text x="62" y="124" fill="#5A5A5A" font-family="ui-monospace,Consolas,monospace" font-size="10" text-anchor="end">0.06</text>
+<line x1="70" y1="60" x2="676" y2="60" stroke="#2a2a2a" stroke-width="1"/>
+<text x="62" y="64" fill="#5A5A5A" font-family="ui-monospace,Consolas,monospace" font-size="10" text-anchor="end">0.09</text>
+<rect x="100" y="6" width="72" height="234" fill="#5BD61E"/>
+<text x="136" y="-2" fill="#5BD61E" font-family="ui-monospace,Consolas,monospace" font-size="11" text-anchor="middle" transform="translate(0,20)">0.117</text>
+<text x="136" y="262" fill="#C9C9C9" font-family="ui-monospace,Consolas,monospace" font-size="11" text-anchor="middle">n = 30</text>
+<rect x="220" y="102" width="72" height="138" fill="#5BD61E" opacity="0.82"/>
+<text x="256" y="94" fill="#5BD61E" font-family="ui-monospace,Consolas,monospace" font-size="11" text-anchor="middle">0.069</text>
+<text x="256" y="262" fill="#C9C9C9" font-family="ui-monospace,Consolas,monospace" font-size="11" text-anchor="middle">n = 60</text>
+<rect x="340" y="188" width="72" height="52" fill="#5BD61E" opacity="0.64"/>
+<text x="376" y="180" fill="#5BD61E" font-family="ui-monospace,Consolas,monospace" font-size="11" text-anchor="middle">0.026</text>
+<text x="376" y="262" fill="#C9C9C9" font-family="ui-monospace,Consolas,monospace" font-size="11" text-anchor="middle">n = 120</text>
+<rect x="460" y="236" width="72" height="4" fill="#5A5A5A"/>
+<text x="496" y="228" fill="#5A5A5A" font-family="ui-monospace,Consolas,monospace" font-size="11" text-anchor="middle">0.002</text>
+<text x="496" y="262" fill="#C9C9C9" font-family="ui-monospace,Consolas,monospace" font-size="11" text-anchor="middle">n = 300</text>
+<rect x="580" y="239" width="72" height="1" fill="#5A5A5A"/>
+<text x="616" y="228" fill="#5A5A5A" font-family="ui-monospace,Consolas,monospace" font-size="11" text-anchor="middle">0.000</text>
+<text x="616" y="262" fill="#C9C9C9" font-family="ui-monospace,Consolas,monospace" font-size="11" text-anchor="middle">n = 900</text>
+<text x="24" y="288" fill="#767676" font-family="ui-monospace,Consolas,monospace" font-size="11">dieselbe wahre qualitaet, nur die fallzahl unterscheidet sich</text>
+</svg>
+  <figcaption>Dieselbe wahre Qualität, derselbe Referenzwert: Eine kleine Einheit wird mit rund 12 Prozent Wahrscheinlichkeit auffällig, eine große praktisch nie. Der feste Schwellenwert misst hier die Fallzahl und nicht die Leistung.</figcaption>
+  </figure>
+
+  <p>Der Bericht sagt also nicht „diese Einheit ist schlecht". Er sagt „diese Einheit ist klein". Und weil er jeden Monat läuft, sagt er das jeden Monat neu.</p>
+  <p>Goldstein und Spiegelhalter haben die statistischen Grenzen von Einrichtungsvergleichen 1996 beschrieben. Anhøj und Hellesøe haben 2017 in <em>BMJ Quality &amp; Safety</em> nachgelegt: Ampellogik über feste Zielwerte lenkt von Zufallsvariation ab, statt sie sichtbar zu machen. Und Schmidtke und Kollegen haben im selben Jahr nachgesehen, wie oft das in der Praxis berücksichtigt wird: In 30 englischen NHS-Board-Berichten fanden sie 1.488 Diagramme, von denen <strong>88, also sechs Prozent</strong>, überhaupt darstellten, welche Rolle der Zufall spielt.</p>
+  <p>Die deutsche Qualitätssicherung im Gesundheitswesen stellt seit 2022 schrittweise um, weg vom festen Schwellenwert und hin zu einer fallzahlabhängigen Einstufung, Verfahren für Verfahren. Die Begründung dort lautet, dass die Variabilität einer Kennzahl fallzahlabhängig ist und ihr Ignorieren dazu führt, dass allein aus stochastischen Gründen bei Leistungserbringern mit geringer Fallzahl viele Auffälligkeiten auftreten. Die Einstufung selbst läuft in diesem Rahmen bayesianisch; der Funnel Plot dient der Darstellung. In automatisierten Berichten außerhalb der Qualitätssicherung steht die Zeile von oben weiter drin.</p>
+
+  <h2>Die Idee in einem Satz</h2>
+  <p>Die Vergleichsgrenze muss mit der Fallzahl mitwachsen: eng bei großen Einheiten, weit bei kleinen, und um genau den Betrag weiter, den die Streuung tatsächlich hergibt.</p>
+  <p>Trägt man die Grenzen über der Fallzahl auf, ergibt sich ein Trichter. Daher der Name.</p>
+  <p><strong>Ein Satz Abgrenzung, weil der Begriff auf Deutsch belegt ist:</strong> Wer „Funnel Plot" sucht, landet fast immer beim Trichterdiagramm der Meta-Analyse: Effektschätzer gegen Präzision, Asymmetrie als Hinweis auf Publikationsbias, Egger-Test. Das ist ein anderes Verfahren mit demselben Bild. Hier geht es nicht um Asymmetrie über Studien hinweg, sondern darum, ob eine einzelne Einheit ihre fallzahlabhängige Kontrollgrenze verlässt. Auch in R sind das zwei getrennte Paketfamilien: <code>metaviz</code> und <code>metafor</code> für die Meta-Analyse, <code>FunnelPlotR</code> und <code>controlcharts</code> für den Einrichtungsvergleich.</p>
+
+  <h2>Der Code</h2>
+  <p>50 Einheiten, sehr unterschiedliche Fallzahlen (Median 190, Spanne 25 bis 1213). Die wahre Qualität liegt bei 0,86 und streut wenig, außer bei zwei Einheiten, die tatsächlich schlechter sind (0,72). Im simulierten Datensatz ist bekannt, welche beiden das sind. Im Betrieb ist es das nicht, und genau darum geht es.</p>
+
+  <div class="filelabel">funnel_kennzahlen.R</div>
+<pre><span class="fn">library</span>(dplyr)
+<span class="fn">set.seed</span>(2026)
+
+N &lt;- 50; ZIELWERT &lt;- 0.86; TAU &lt;- 0.015
+REFERENZ &lt;- 0.80          <span class="cmt"># der Wert, gegen den naiv geprueft wird</span>
+AUSREISSER &lt;- <span class="fn">c</span>(8, 24)    <span class="cmt"># diese beiden sind wirklich schlechter</span>
+Z &lt;- 3.09                 <span class="cmt"># ~99,8 %, Konvention nach Spiegelhalter (2005)</span>
+
+n_faelle &lt;- <span class="fn">pmin</span>(<span class="fn">pmax</span>(<span class="fn">round</span>(<span class="fn">exp</span>(<span class="fn">rnorm</span>(N, <span class="fn">log</span>(180), 1.0))), 25), 2000)
+p_wahr   &lt;- <span class="fn">pmin</span>(<span class="fn">pmax</span>(<span class="fn">rnorm</span>(N, ZIELWERT, TAU), 0.01), 0.99)
+p_wahr[AUSREISSER] &lt;- 0.72
+
+dat &lt;- <span class="fn">tibble</span>(
+  einheit  = <span class="fn">sprintf</span>(<span style="color:#c98">"E%02d"</span>, <span class="fn">seq_len</span>(N)),
+  n_faelle = n_faelle,
+  erfuellt = <span class="fn">rbinom</span>(N, n_faelle, p_wahr)
+) |&gt;
+  <span class="fn">mutate</span>(ergebnis = erfuellt / n_faelle)</pre>
+
+  <p><strong>Weg A: der Schwellenwert.</strong> Eine Zeile, kein Modell, keine Unsicherheit:</p>
+
+<pre>dat &lt;- dat |&gt; <span class="fn">mutate</span>(auffaellig_schwelle = ergebnis &lt; REFERENZ)</pre>
+
+  <p><strong>Weg B: Funnel-Grenzen mit Overdispersion-Korrektur.</strong> Erst der gepoolte Zielwert, dann der Standardfehler je Einheit, dann φ:</p>
+
+<pre>theta_hat &lt;- dat |&gt;
+  <span class="fn">summarise</span>(theta = <span class="fn">sum</span>(erfuellt) / <span class="fn">sum</span>(n_faelle)) |&gt;
+  <span class="fn">pull</span>(theta)
+
+dat &lt;- dat |&gt;
+  <span class="fn">mutate</span>(se = <span class="fn">sqrt</span>(theta_hat * (1 - theta_hat) / n_faelle),
+         z  = (ergebnis - theta_hat) / se)
+
+<span class="cmt"># phi faengt die Streuung auf, die ueber die reine Binomialstreuung hinausgeht:</span>
+<span class="cmt"># unbeobachtete Risikofaktoren, Fallmix, alles, was das Modell nicht kennt.</span>
+<span class="cmt"># Winsorisierung bei 10/90 %, damit die echten Ausreisser phi nicht aufblasen;</span>
+<span class="cmt"># sonst versteckt das Verfahren genau das, was es finden soll.</span>
+phi &lt;- dat |&gt;
+  <span class="fn">mutate</span>(z_w = <span class="fn">pmin</span>(<span class="fn">pmax</span>(z, <span class="fn">quantile</span>(z, .10)), <span class="fn">quantile</span>(z, .90))) |&gt;
+  <span class="fn">summarise</span>(phi = <span class="fn">max</span>(<span class="fn">mean</span>(z_w^2), 1)) |&gt;
+  <span class="fn">pull</span>(phi)
+
+dat &lt;- dat |&gt;
+  <span class="fn">mutate</span>(untere_grenze     = theta_hat - Z * se * <span class="fn">sqrt</span>(phi),
+         auffaellig_funnel = ergebnis &lt; untere_grenze)</pre>
+
+  <p>Das war es. <code>theta_hat = 0,8509</code>, <code>phi = 1,01</code> in diesem Lauf.</p>
+  <p>Drei Entscheidungen fallen dabei an und gehören dokumentiert: welche Konstruktion der Kontrollgrenzen, welches z, ob und wie winsorisiert wird. Beiwerk ist das nicht. Verburg und Kollegen haben 2018 eine Leitlinie dazu geschrieben, weil in Anwendungsstudien regelmäßig unklar bleibt, welche Variante verwendet wurde; verschiedene Wahlen führen zu verschiedenen Ergebnissen. Wer es produktiv einsetzt, schreibt die Wahl in den Bericht.</p>
+
+  <h2>Das Ergebnis</h2>
+  <p><strong>Einzellauf.</strong> Der Schwellenwert markiert 2 Einheiten, die Funnel-Grenzen 1. Beide markierten Einheiten des Schwellenwerts sind echte Ausreißer, die des Funnels ebenfalls. Hier tut noch niemandem etwas weh. Ein Einzellauf trägt aber keine Aussage. Also 1000 Wiederholungen:</p>
+
+  <table>
+    <tr><th></th><th>fester Schwellenwert</th><th>Funnel-Grenzen</th></tr>
+    <tr><td><strong>Fehlalarme je Bericht</strong></td><td><strong>2,050</strong></td><td><strong>0,159</strong> (Faktor 12,9)</td></tr>
+    <tr><td>davon in der kleineren Hälfte der Einheiten</td><td><strong>87,6 %</strong></td><td>27,0 %</td></tr>
+    <tr><td>gefundene echte Ausreißer (von 2)</td><td>1,926</td><td>1,552</td></tr>
+  </table>
+
+  <p>φ über die 1000 Läufe: Median 1,135, Spanne 1,000 bis 2,366.</p>
+  <p>Zwei Zahlen zum Mitnehmen. Erstens: Der Schwellenwert erzeugt fast dreizehnmal so viele Fehlalarme. Zweitens, und das ist die eigentliche Pointe: <strong>fast neun von zehn dieser Fehlalarme treffen Einheiten aus der kleineren Hälfte</strong>, also aus der Hälfte mit einer Fallzahl unter dem Median. Bei größenneutralen Fehlalarmen wären 50 Prozent zu erwarten. Beim Funnel sind es 27 Prozent, also sogar weniger: Die Grenzen werden bei kleiner Fallzahl so weit, dass dort kaum noch etwas markiert wird.</p>
+  <p><strong>Und genau das ist der Preis.</strong> Der Schwellenwert findet mehr echte Ausreißer: 1,926 gegen 1,552 von zwei, ein Rückgang um 19 Prozent. Wer die Fehlalarme loswerden will, verliert Trennschärfe, und zwar dort, wo sie ohnehin am schwächsten ist. Seaton und Kollegen haben 2013 genau das untersucht: Die Wahrscheinlichkeit, dass ein tatsächlich schlechter Leistungserbringer im Funnel Plot auffällt, ist niedrig, besonders bei kleinen Fallzahlen. Der Trichter schützt die kleinen Einheiten vor falschen Anschuldigungen. Er versteckt sie damit auch.</p>
+  <p>Wer den Rückgang der Trefferquote weglässt, berichtet das halbe Ergebnis.</p>
+  <p><strong>Ein Wort zu φ.</strong> In diesem Beispiel liegt es bei 1,01, im Median über 1000 Läufe bei 1,135. Die Overdispersion-Korrektur greift hier also kaum. Der ganze Gewinn kommt aus der Fallzahlabhängigkeit der Grenzen. φ ist die Versicherung für den anderen Fall: Daten, in denen mehr streut, als das Binomialmodell erlaubt, weil Fallmix und unbeobachtete Risikofaktoren mitspielen. In echten Qualitätsdaten ist das die Regel. Im simulierten Beispiel ist es das nicht, und das gehört dazugesagt.</p>
+
+  <h2>So nutze ich das produktiv</h2>
+  <p>Drei Dinge ändern sich, wenn das nicht in einem Skript steht, sondern in einer Pipeline, die monatlich läuft.</p>
+  <p><strong>Erstens: das Ergebnis-Objekt vom Rendering trennen.</strong> Nicht der Bericht rechnet, sondern eine Funktion, die ein geprüftes Ergebnis-Objekt zurückgibt; der Bericht rendert es nur noch. Das ist der Unterschied zwischen „wir haben die Zahl im Bericht gefunden" und „wir können die Zahl testen". In der klinischen Statistik heißt das Muster <em>Analysis Results Data</em>; die Pakete <code>cards</code> und <code>gtsummary</code> bauen darauf auf. Praktisch heißt es: <code>berechne_auffaelligkeiten()</code> gibt einen Data Frame zurück, <code>testthat</code> prüft ihn, und erst danach kommt Word ins Spiel.</p>
+  <p><strong>Zweitens: die Grenze zeichnen.</strong> Für den Bericht statisch: <code>FunnelPlotR</code> (Mainey, NHS-R Community) implementiert Spiegelhalters Methode und nimmt einem laut Paketbeschreibung die additive Overdispersion-Korrektur samt Winsorisierung ab. Für die interaktive Anlage <code>controlcharts</code> (Johnson mit dem Healthcare Quality Intelligence Unit, Western Australia Health, seit August 2026 auf CRAN): rechnet und zeichnet laut Beschreibung vollständig in JavaScript und läuft damit <strong>ohne Shiny-Server</strong> in jedem HTML-Bericht. Daraus wird eine Entscheidungsregel: statisch, was gedruckt wird, interaktiv, was geklickt wird.</p>
+  <p><strong>Drittens: der Weg nach Word.</strong> Verlangt der Auftraggeber ein <code>.docx</code>, gibt es drei Wege, und die Wahl ist eine Entscheidung und kein Geschmack:</p>
+
+  <table>
+    <tr><th>Weg</th><th>Wann</th><th>Grenze</th></tr>
+    <tr><td><code>officer</code> programmatisch</td><td>volle Kontrolle über das Layout, Berichte mit variabler Struktur</td><td>jeder Absatz ist Code</td></tr>
+    <tr><td>R Markdown + <code>officedown</code></td><td>wiederkehrende Berichte mit fester Struktur, Corporate Design über Referenz-<code>.docx</code></td><td>unterstützt <strong>kein</strong> Quarto</td></tr>
+    <tr><td>Quarto + Referenz-<code>.docx</code></td><td>wenn der Rest des Hauses ohnehin Quarto ist</td><td>Cross-Referenzen bleiben Klartext, Deckblatt ungelöst</td></tr>
+  </table>
+
+  <p>Die Faustregel, die sich bei mir durchgesetzt hat: feste Struktur und Corporate Design → <code>officedown</code>; variable Struktur oder Anlagen, die sich je Lauf unterscheiden → <code>officer</code>; Quarto nur, wenn Word nicht das primäre Ziel ist.</p>
+
+  <div class="callout">
+    <div class="t">WAS DAS FÜR DIE PIPELINE HEISST</div>
+    <p style="margin:0">Automatisierung skaliert den Bericht und den methodischen Fehler darin gleich mit. Eine Pipeline, die monatlich 40 Berichte erzeugt, kommt bei 2,05 Fehlalarmen je Bericht auf gut 80 im Monat und knapp tausend im Jahr. Das sind Gespräche, die nicht hätten stattfinden müssen, überwiegend mit den kleinen Einheiten.</p>
+  </div>
+
+  <h2>Fazit</h2>
+  <p>Ein fester Schwellenwert verwechselt Ergebnis und Fallzahl. Fallzahlabhängige Grenzen kosten rund zwanzig Zeilen R und senken die Fehlalarme im Beispiel um den Faktor 12,9, für den Preis von 19 Prozent Trefferquote, die man beim Namen nennen muss.</p>
+  <p>Die Frage vor dem nächsten automatisierten Bericht lautet deshalb nicht „welches Werkzeug?", sondern: <strong>Wonach entscheidet die Bewertungszeile, nach der Leistung oder nach der Größe?</strong></p>
+
+  <h2>Drei Anlässe, bei denen sich das lohnt</h2>
+  <ul>
+    <li>Ein Bericht vergleicht Standorte, Regionen, Filialen oder Einrichtungen mit sehr unterschiedlicher Größe.</li>
+    <li>Dieselben kleinen Einheiten fallen jeden Monat auf, ohne dass sich etwas ändert.</li>
+    <li>Die Bewertungsregel im Bericht ist älter als die Datengrundlage, auf die sie angewandt wird.</li>
+  </ul>
+
+  <div class="callout">
+    <div class="eyebrow">AUS DERSELBEN REIHE</div>
+    <p><a href="/insights/decision-curve-analysis.html">Decision Curve Analysis in R: wann ein Modell eine Entscheidung wirklich verbessert</a>. Warum zwei Modelle mit identischer AUC unterschiedlich nützlich sein können.</p>
+    <p style="margin-bottom:0"><a href="/insights/conformal-prediction-xgboost.html">Vorhersageintervalle für XGBoost-Prognosen: Conformal Prediction in R</a>. Prognoseintervalle mit nachprüfbarer Überdeckung.</p>
+  </div>
+
+  <div class="cta">
+    <div style="font:600 12px ui-monospace,Consolas,monospace;letter-spacing:.1em;color:#5BD61E;margin-bottom:8px">ÄHNLICHE FRAGESTELLUNG?</div>
+    <p style="margin:0 0 4px">Ein automatisierter Bericht, der Einheiten sehr unterschiedlicher Größe vergleicht: Im 15-minütigen Erstgespräch kläre ich, welche Prüfgröße dazugehört und wie sie in den Betrieb kommt.</p>
+    <a href="https://cal.com/nico-schafer-xmc3xr/erstgesprach" target="_blank" rel="noopener">15-MIN-TERMIN BUCHEN →</a>
+    <p style="margin:10px 0 0;font-size:15px">Wie Kennzahlenberichte bei sove.it gebaut und in Betrieb genommen werden: <a href="/#leistungen">automatisiertes Reporting und produktive R-Anwendungen</a>.</p>
+  </div>
+
+  <p class="note">Alle Zahlen stammen aus einem tatsächlich gelaufenen Beispiel mit simulierten Daten (50 Einheiten, Median 190 Fälle, Spanne 25 bis 1213, <code>set.seed(2026)</code>, 1000 Wiederholungen): keine Projektergebnisse und keine illustrativen Werte. Der Lauf erfolgte am 01.09.2026 in einem Container mit R 4.1.2 und den Ubuntu-Paketständen von 2022 (dplyr 1.0.8, ggplot2 3.3.5); CRAN war aus der Umgebung nicht erreichbar. Das betrifft die Werkzeugversionen und nicht die Rechnung: Zielwert, Standardfehler, φ und die Grenzen sind einfache Arithmetik und hängen an keiner Paketversion. Die Angaben zu <code>FunnelPlotR</code> und <code>controlcharts</code> beruhen auf den Paketbeschreibungen und nicht auf einem eigenen Lauf.</p>
+
+  <h2>Quellen</h2>
+  <ul class="quellen">
+    <li>Spiegelhalter, D. J. (2005): Funnel plots for comparing institutional performance. <em>Statistics in Medicine</em> 24(8), 1185–1202.</li>
+    <li>Spiegelhalter, D. J. (2005): Handling over-dispersion of performance indicators. <em>Quality and Safety in Health Care</em> 14(5), 347–351.</li>
+    <li>Goldstein, H. &amp; Spiegelhalter, D. J. (1996): League Tables and Their Limitations. <em>Journal of the Royal Statistical Society A</em> 159(3), 385 ff.</li>
+    <li>Verburg, I. W. M., Holman, R., Peek, N., Abu-Hanna, A. &amp; de Keizer, N. F. (2018): Guidelines on constructing funnel plots for quality indicators. <em>Statistical Methods in Medical Research</em> 27(11), 3350–3366.</li>
+    <li>Seaton, S. E., Barker, L., Lingsma, H. F., Steyerberg, E. W. &amp; Manktelow, B. N. (2013): What is the probability of detecting poorly performing hospitals using funnel plots? <em>BMJ Quality &amp; Safety</em> 22(10), 870–876.</li>
+    <li>Seaton, S. E. &amp; Manktelow, B. N. (2012): The probability of being identified as an outlier with commonly used funnel plot control limits for the standardised mortality ratio. <em>BMC Medical Research Methodology</em> 12, 98.</li>
+    <li>Anhøj, J. &amp; Hellesøe, A.-M. B. (2017): The problem with red, amber, green. <em>BMJ Quality &amp; Safety</em> 26(1), 81–84.</li>
+    <li>Schmidtke, K. A. et al. (2017): Considering chance in quality and safety performance measures. <em>BMJ Quality &amp; Safety</em> 26(1), 61–69.</li>
+    <li>Hengelbrock, J., Rauh, J., Cederbaum, J., Kähler, M. &amp; Höhle, M. (2023): Hospital Profiling Using Bayesian Decision Theory. <em>Biometrics</em> 79(3), 2757–2769.</li>
+    <li>Egger, M., Davey Smith, G., Schneider, M. &amp; Minder, C. (1997): Bias in meta-analysis detected by a simple, graphical test. <em>BMJ</em> 315(7109), 629–634. (Abgrenzung Meta-Analyse)</li>
+    <li>Sterne, J. A. C. et al. (2011): Recommendations for examining and interpreting funnel plot asymmetry in meta-analyses of randomised controlled trials. <em>BMJ</em> 343, d4002.</li>
+    <li>R-Pakete: <code>FunnelPlotR</code> 0.6.0 (Mainey) · <code>controlcharts</code> 0.0.19 (Johnson) · <code>qicharts2</code> 0.8.1 (Anhøj) · <code>officer</code>, <code>officedown</code>, <code>flextable</code> (Gohel)</li>
+  </ul>
+</article>
+
+<footer><div class="wrap">© 2026 sove.it e.K. · FROM DATA TO DECISIONS &nbsp;·&nbsp; Methoden-Notizen erscheinen monatlich.
+<div class="meta" style="margin:8px 0 0"><a href="/insights/feed.xml">Feed abonnieren</a></div></div></footer>
+<script data-goatcounter="https://sn1k.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>

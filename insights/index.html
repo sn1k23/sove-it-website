@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' https://gc.zgo.at; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://sn1k.goatcounter.com; font-src 'self' data:; connect-src https://sn1k.goatcounter.com; base-uri 'none'; form-action 'none'; upgrade-insecure-requests">
-<title>Methoden-Notizen — sove.it</title>
-<meta name="description" content="Methoden-Notizen von sove.it: kurze, praxisnahe Beiträge zu Statistik, R und produktiver Datenanalyse — Paneldaten, Kausalität, Predictive Analytics, ETL.">
+<title>Methoden-Notizen · sove.it</title>
+<meta name="description" content="Methoden-Notizen von sove.it: kurze, praxisnahe Beiträge zu Statistik, R und produktiver Datenanalyse. Paneldaten, Kausalität, Predictive Analytics, ETL.">
 <meta name="theme-color" content="#141414">
-<meta property="og:title" content="Methoden-Notizen — sove.it">
-<meta property="og:description" content="Statistik, R und produktive Datenanalyse — kurz und aus der Projektpraxis.">
+<meta property="og:title" content="Methoden-Notizen · sove.it">
+<meta property="og:description" content="Statistik, R und produktive Datenanalyse, kurz und aus der Projektpraxis.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://www.sove-it.de/insights/">
 <meta property="og:image" content="https://www.sove-it.de/og-image.png">
@@ -48,13 +48,15 @@
  "@id":"https://www.sove-it.de/insights/#blog",
  "name":"Methoden-Notizen",
  "alternateName":"sove.it Insights",
- "description":"Methoden-Notizen von sove.it: Statistik, R und produktive Datenanalyse — ein Verfahren je Beitrag, mit lauffähigem Code und der Prüfgröße, die dazugehört.",
+ "description":"Methoden-Notizen von sove.it: Statistik, R und produktive Datenanalyse. Ein Verfahren je Beitrag, mit lauffähigem Code und der Prüfgröße, die dazugehört.",
  "url":"https://www.sove-it.de/insights/",
  "inLanguage":"de",
  "image":"https://www.sove-it.de/og-image.png",
  "publisher":{"@type":"Organization","name":"sove.it e.K.","url":"https://www.sove-it.de/"},
  "author":{"@type":"Person","name":"Nico Schäfer","url":"https://www.sove-it.de/#profil"},
  "blogPost":[
+   {"@type":"BlogPosting","headline":"Decision Curve Analysis in R: wann ein Modell eine Entscheidung wirklich verbessert","url":"https://www.sove-it.de/insights/decision-curve-analysis.html","datePublished":"2026-09-10"},
+   {"@type":"BlogPosting","headline":"Kennzahlenberichte in R automatisieren: Funnel Plots statt fester Schwellenwerte","url":"https://www.sove-it.de/insights/funnel-plots-kennzahlenberichte.html","datePublished":"2026-09-10"},
    {"@type":"BlogPosting","headline":"Vorhersageintervalle für XGBoost-Prognosen: Conformal Prediction in R","url":"https://www.sove-it.de/insights/conformal-prediction-xgboost.html","datePublished":"2026-07-30"},
    {"@type":"BlogPosting","headline":"Mundlak-Zerlegung in R: Within- und Between-Effekt in Paneldaten trennen","url":"https://www.sove-it.de/insights/mundlak-zerlegung.html","datePublished":"2026-07-13"}]}
 </script>
@@ -70,20 +72,34 @@
 <main class="wrap">
   <div class="eyebrow">METHODEN-NOTIZEN</div>
   <h1>Methoden-Notizen: Statistik, R und produktive Datenanalyse</h1>
-  <p class="intro">Statistik, R und produktive Datenanalyse — kein Buzzword-Katalog, sondern Methoden, die ich in realen Projekten einsetze, mit lauffähigem Code und dem ehrlichen Blick auf die Grenzen. Erscheint regelmäßig, zuletzt am 30. Juli 2026.</p>
+  <p class="intro">Ein Verfahren je Beitrag: was es leistet, wie es in R läuft, wo es aufhört. Was hier steht, setze ich in realen Projekten ein, mit lauffähigem Code und benannten Grenzen. Erscheint monatlich, zuletzt am 10. September 2026.</p>
   <p class="intro" style="margin-bottom:40px">Wie diese Methoden im Projekt eingesetzt werden: <a href="/#leistungen">Leistungen von sove.it</a>.</p>
+
+  <a class="post" href="/insights/decision-curve-analysis.html">
+    <div class="pmeta"><time datetime="2026-09-10">10. September 2026</time> · ~10 Min Lesezeit</div>
+    <h2 class="pt">Decision Curve Analysis in R: wann ein Modell eine Entscheidung wirklich verbessert</h2>
+    <div class="pex">Zwei Modelle, dieselbe AUC bis auf die letzte Stelle. Bei niedriger Entscheidungsschwelle spart eines im Mittel 64 unnötige Wartungen je 1000 Anlagen, das andere ist in 85 von 100 Läufen schlechter als „alle warten".</div>
+    <div style="margin-top:12px"><span class="tag">PREDICTIVE ANALYTICS</span><span class="tag">MODELLGÜTE</span><span class="tag">R</span></div>
+  </a>
+
+  <a class="post" href="/insights/funnel-plots-kennzahlenberichte.html">
+    <div class="pmeta"><time datetime="2026-09-10">10. September 2026</time> · ~10 Min Lesezeit</div>
+    <h2 class="pt">Kennzahlenberichte in R automatisieren: Funnel Plots statt fester Schwellenwerte</h2>
+    <div class="pex">Ein fester Referenzwert erzeugt im Beispiel 2,05 Fehlalarme je Bericht, fallzahlabhängige Grenzen 0,16. Fast neun von zehn Fehlalarmen treffen die kleinen Einheiten. Mit Overdispersion-Korrektur, gerechnetem Vergleich und dem Preis an Trennschärfe.</div>
+    <div style="margin-top:12px"><span class="tag">REPORTING</span><span class="tag">QUALITÄTSSICHERUNG</span><span class="tag">R</span></div>
+  </a>
 
   <a class="post" href="/insights/conformal-prediction-xgboost.html">
     <div class="pmeta"><time datetime="2026-07-30">30. Juli 2026</time> · ~9 Min Lesezeit</div>
     <h2 class="pt">Vorhersageintervalle für XGBoost-Prognosen: Conformal Prediction in R</h2>
-    <div class="pex">Ein Punktwert sagt nicht, wie sicher er ist. Keine zwanzig Zeilen R liefern ein Intervall mit nachprüfbarer Überdeckung — und zeigen im simulierten Beispiel, wie aus zugesagten 90 Prozent im kritischen Segment 50,8 Prozent werden können.</div>
+    <div class="pex">Ein Punktwert sagt nicht, wie sicher er ist. Keine zwanzig Zeilen R liefern ein Intervall mit nachprüfbarer Überdeckung. Im simulierten Beispiel werden aus zugesagten 90 Prozent im kritischen Segment 50,8.</div>
     <div style="margin-top:12px"><span class="tag">PREDICTIVE ANALYTICS</span><span class="tag">UNSICHERHEIT</span><span class="tag">R</span></div>
   </a>
 
   <a class="post" href="/insights/mundlak-zerlegung.html">
     <div class="pmeta"><time datetime="2026-07-13">13. Juli 2026</time> · ~7 Min Lesezeit</div>
     <h2 class="pt">Mundlak-Zerlegung in R: Within- und Between-Effekt in Paneldaten trennen</h2>
-    <div class="pex">Warum naive Panelmodelle Wirkung und Selektion vermischen — und wie eine einzige Zeile Code beides trennt. Mit plm, glmmTMB und produktiver Umsetzung.</div>
+    <div class="pex">Warum naive Panelmodelle Wirkung und Selektion vermischen und wie eine einzige Zeile Code die beiden Varianzquellen trennt. Mit plm, glmmTMB und produktiver Umsetzung.</div>
     <div style="margin-top:12px"><span class="tag">PANELDATEN</span><span class="tag">KAUSALANALYSE</span><span class="tag">R</span></div>
   </a>
 

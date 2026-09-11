@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' https://gc.zgo.at; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://sn1k.goatcounter.com; font-src 'self' data:; connect-src https://sn1k.goatcounter.com; base-uri 'none'; form-action 'none'; upgrade-insecure-requests">
+<link rel="alternate" type="application/atom+xml" title="sove.it Insights" href="https://www.sove-it.de/insights/feed.xml">
+<meta name="author" content="Nico Schäfer">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+<meta name="description" content="Decision Curve Analysis in R: Net Benefit statt AUC. Zwei Modelle mit identischer AUC, eines davon bei niedriger Entscheidungsschwelle schlechter als gar kein Modell. Mit gerechnetem Beispiel und dplyr-Code.">
+<meta name="theme-color" content="#141414">
+<meta property="og:title" content="Decision Curve Analysis in R: wann ein Modell eine Entscheidung wirklich verbessert">
+<meta property="og:description" content="Zwei Modelle, dieselbe AUC bis auf die letzte Stelle. Bei niedriger Schwelle spart eines 64 unnötige Wartungen je 1000 Anlagen, das andere ist in 85 von 100 Läufen schlechter als „alle warten".">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://www.sove-it.de/insights/decision-curve-analysis.html">
+<meta property="og:image" content="https://www.sove-it.de/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="sove.it · FROM DATA TO DECISIONS">
+<meta property="og:site_name" content="sove.it e.K.">
+<meta property="og:locale" content="de_DE">
+<meta property="article:published_time" content="2026-09-10">
+<meta property="article:modified_time" content="2026-09-10">
+<meta property="article:author" content="Nico Schäfer">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Decision Curve Analysis in R: wann ein Modell eine Entscheidung wirklich verbessert">
+<meta name="twitter:description" content="Die AUC misst die Sortierung, nicht den Nutzen. Der Net Benefit verrechnet Treffer und Fehlalarme über das Kostenverhältnis, das im konkreten Fall gilt.">
+<meta name="twitter:image" content="https://www.sove-it.de/og-image.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23141414'/%3E%3Cg transform='translate(30,32)'%3E%3Crect y='10' width='5' height='26' fill='%23fff'/%3E%3Crect x='7' y='15' width='5' height='21' fill='%23fff'/%3E%3Crect x='14' width='5' height='36' fill='%23fff'/%3E%3Crect x='21' y='20' width='5' height='16' fill='%235BD61E'/%3E%3Crect x='28' y='5' width='5' height='31' fill='%23fff'/%3E%3Crect x='35' y='10' width='5' height='26' fill='%23fff'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="canonical" href="https://www.sove-it.de/insights/decision-curve-analysis.html">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting",
+ "@id":"https://www.sove-it.de/insights/decision-curve-analysis.html#post",
+ "headline":"Decision Curve Analysis in R: wann ein Modell eine Entscheidung wirklich verbessert",
+ "description":"Decision Curve Analysis in R: Net Benefit statt AUC. Zwei Modelle mit identischer AUC, eines davon bei niedriger Entscheidungsschwelle schlechter als gar kein Modell.",
+ "datePublished":"2026-09-10",
+ "dateModified":"2026-09-10",
+ "inLanguage":"de",
+ "image":"https://www.sove-it.de/og-image.png",
+ "author":{"@type":"Person","name":"Nico Schäfer","url":"https://www.sove-it.de/#profil",
+   "jobTitle":"Statistiker & Data Scientist",
+   "sameAs":["https://www.linkedin.com/in/nicosch%C3%A4fer/","https://github.com/sn1k23"]},
+ "publisher":{"@type":"Organization","name":"sove.it e.K.","url":"https://www.sove-it.de/",
+   "logo":{"@type":"ImageObject","url":"https://www.sove-it.de/og-image.png"}},
+ "mainEntityOfPage":{"@type":"WebPage","@id":"https://www.sove-it.de/insights/decision-curve-analysis.html"},
+ "isPartOf":{"@type":"Blog","@id":"https://www.sove-it.de/insights/#blog","name":"Methoden-Notizen","url":"https://www.sove-it.de/insights/"},
+ "articleSection":"Prognose & Modellgüte",
+ "keywords":"Decision Curve Analysis, Entscheidungskurvenanalyse, Net Benefit, AUC, Kalibrierung, Schwellenwahrscheinlichkeit, Vickers, dcurves, Predictive Maintenance, R"}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Start","item":"https://www.sove-it.de/"},{"@type":"ListItem","position":2,"name":"Insights","item":"https://www.sove-it.de/insights/"},{"@type":"ListItem","position":3,"name":"Decision Curve Analysis","item":"https://www.sove-it.de/insights/decision-curve-analysis.html"}]}
+</script>
+<title>Decision Curve Analysis in R: wann ein Modell eine Entscheidung wirklich verbessert</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#141414;color:#C9C9C9;font:16px/1.7 Arial,Helvetica,sans-serif}
+  a{color:#5BD61E;text-decoration:none} a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 24px}
+  header{border-bottom:1px solid #2a2a2a;padding:22px 0;margin-bottom:44px}
+  .logo{font:700 15px ui-monospace,Consolas,monospace;color:#fff;letter-spacing:.12em}
+  .logo .dot{color:#5BD61E}
+  .eyebrow{font:600 12px ui-monospace,Consolas,monospace;letter-spacing:.28em;color:#5BD61E;margin-bottom:16px}
+  h1{font:700 40px/1.15 ui-monospace,Consolas,monospace;color:#fff;margin-bottom:10px;letter-spacing:-.01em}
+  .kicker{font:13px/1.6 ui-monospace,Consolas,monospace;color:#767676;margin-bottom:18px}
+  .meta{font:13px ui-monospace,Consolas,monospace;color:#767676;margin-bottom:40px}
+  h2{font:700 22px ui-monospace,Consolas,monospace;color:#fff;margin:40px 0 14px}
+  p{margin-bottom:18px} .lead{font-size:18px;color:#e6e6e6}
+  ul{margin:0 0 18px 22px} li{margin-bottom:8px}
+  code{font-family:ui-monospace,Consolas,monospace;color:#8fe36a;font-size:.92em}
+  pre{background:#191919;border:1px solid #2a2a2a;border-radius:8px;padding:18px 20px;overflow-x:auto;margin:22px 0;
+      font:13px/1.6 ui-monospace,Consolas,monospace;color:#dcdcdc}
+  pre .cmt{color:#767676} pre .fn{color:#5BD61E}
+  .filelabel{font:600 12px ui-monospace,Consolas,monospace;color:#767676;margin:22px 0 -12px}
+  .callout{border-left:3px solid #5BD61E;background:#191919;padding:16px 20px;margin:26px 0;border-radius:0 8px 8px 0}
+  .callout .t{font:600 12px ui-monospace,Consolas,monospace;letter-spacing:.1em;color:#5BD61E;margin-bottom:8px}
+  .tldr{border:1px solid #2a2a2a;background:#191919;border-radius:8px;padding:18px 22px;margin:0 0 32px}
+  .tldr .t{font:600 12px ui-monospace,Consolas,monospace;letter-spacing:.1em;color:#5BD61E;margin-bottom:10px}
+  .tldr ul{margin:0;padding-left:20px} .tldr li{margin-bottom:7px;font-size:15px}
+  .tldr li:last-child{margin-bottom:0}
+  .formel{background:#191919;border:1px solid #2a2a2a;border-radius:8px;padding:16px 20px;margin:22px 0;
+          font:15px ui-monospace,Consolas,monospace;color:#fff;text-align:center}
+  figure{margin:28px 0} figcaption{font:12px ui-monospace,Consolas,monospace;color:#767676;margin-top:10px;text-align:center}
+  table{border-collapse:collapse;width:100%;margin:22px 0;font:13.5px/1.5 ui-monospace,Consolas,monospace}
+  th,td{border-bottom:1px solid #2a2a2a;padding:9px 10px;text-align:left}
+  th{color:#fff;font-weight:600} td{color:#C9C9C9}
+  .cta{border:1px solid #2a2a2a;border-radius:10px;padding:24px;margin:48px 0;background:#191919}
+  .cta a{display:inline-block;background:#5BD61E;color:#141414;font:600 13px ui-monospace,Consolas,monospace;
+         padding:12px 20px;border-radius:6px;margin-top:8px}
+  .cta a:hover{text-decoration:none;box-shadow:0 0 20px rgba(91,214,30,.4)}
+  .note{border-top:1px solid #2a2a2a;margin-top:40px;padding-top:18px;font:13px/1.6 ui-monospace,Consolas,monospace;color:#767676}
+  ul.quellen{list-style:none;padding:0;margin:0} ul.quellen li{font:13px/1.7 ui-monospace,Consolas,monospace;color:#767676;padding-left:18px;text-indent:-18px;margin-bottom:10px}
+  footer{border-top:1px solid #2a2a2a;margin-top:56px;padding:26px 0 60px;font:12px ui-monospace,Consolas,monospace;color:#5A5A5A}
+  @media(max-width:560px){h1{font-size:30px}.wrap{padding:0 18px}}
+</style>
+</head>
+<body>
+<header><div class="wrap"><a href="/" style="color:inherit"><span class="logo">SOVE<span class="dot">.</span>IT</span></a> &nbsp;·&nbsp; <a href="/insights/" style="font:12px ui-monospace,Consolas,monospace;color:#767676">METHODEN-NOTIZEN</a></div></header>
+
+<article class="wrap">
+  <div class="eyebrow">PREDICTIVE ANALYTICS · MODELLGÜTE · R</div>
+  <h1>Decision Curve Analysis in R: wann ein Modell eine Entscheidung wirklich verbessert</h1>
+  <div class="kicker">Methoden-Notizen. Verfahren, die eine Entscheidung tragen, mit der Prüfgröße, die dazugehört.</div>
+  <div class="meta">10. September 2026 · ~10 Min · Nico Schäfer</div>
+
+  <div class="tldr">
+    <div class="t">ZIELSTELLUNG UND ERGEBNIS</div>
+    <ul>
+      <li><strong>Gegeben:</strong> Ein Risikomodell schätzt die Ausfallwahrscheinlichkeit von 4.000 Anlagen. Aus dem Score soll eine Regel werden: Ab welchem Wert wird vorbeugend gewartet?</li>
+      <li><strong>Problem:</strong> Die AUC liegt bei 0,785 und beantwortet diese Frage nicht. Sie ist eine Rangmaßzahl und kennt das Kostenverhältnis zwischen einem Ausfall und einer unnötigen Wartung nicht.</li>
+      <li><strong>Verfahren:</strong> Decision Curve Analysis. Die Handlungsschwelle p_t <em>ist</em> das Kostenverhältnis, und der Net Benefit verrechnet Treffer gegen Fehlalarme zu genau diesem Kurs.</li>
+      <li><strong>Ergebnis im Beispiel:</strong> Zwei Modelle mit identischer AUC bis auf die letzte Stelle (maximale Differenz über 200 Läufe: 0,00e+00). Bei p_t&nbsp;=&nbsp;0,03 spart Modell A im Mittel 64 unnötige Wartungen je 1000 Anlagen, Modell B ist in 85 von 100 Läufen schlechter als die modellfreie Regel „alle warten".</li>
+      <li><strong>Grenze:</strong> Modell B ist bewusst konstruiert, um den Punkt zu isolieren. Die Streuung über 200 Läufe ersetzt keine Inferenz.</li>
+    </ul>
+  </div>
+
+  <p class="lead">Die AUC misst, ob ein Modell Fälle richtig sortiert. Sie misst nicht, ob eine Entscheidung auf ihrer Grundlage besser wird. Der Net Benefit misst das, weil er Treffer und Fehlalarme über genau das Kostenverhältnis verrechnet, das im konkreten Fall gilt. Unten stehen zwei Modelle mit identischer AUC bis auf die letzte Stelle; bei niedriger Entscheidungsschwelle ist eines davon meistens schlechter als die modellfreie Regel „alle warten". Rund zwanzig Zeilen R zeigen den Unterschied.</p>
+
+  <h2>Das Praxisproblem</h2>
+  <p>Ein Vorhersagemodell ist fertig, die AUC liegt bei 0,78. Dann kommt die Frage, die das Modell erst zu einem Werkzeug macht: <strong>Ab welchem Wert handeln wir?</strong></p>
+  <p>Ab da hilft die AUC nicht mehr. Sie ist eine Rangmaßzahl und sagt, wie oft ein zufällig gezogener Ausfall einen höheren Score bekommt als ein zufällig gezogener Nicht-Ausfall. Über die Frage, ob es sich lohnt, bei einem geschätzten Risiko von acht Prozent eine Anlage vorbeugend zu warten, sagt sie nichts. Sie kann es auch nicht sagen, weil in dieser Frage etwas steckt, das nicht in den Daten liegt: <strong>was ein Fehler kostet, und zwar welcher.</strong></p>
+  <p>Nancy Cook hat das 2007 in <em>Circulation</em> an einem Beispiel gezeigt, das seither Standard ist: In der Women's Health Study hoben LDL-, HDL- und Gesamtcholesterin die c-Statistik jeweils nur um 0,01. Wer sein Modell nach der AUC baut, wirft etablierte Risikofaktoren heraus. Falsch ist das Maß deshalb nicht. Es beantwortet nur eine andere Frage als die, die auf dem Tisch liegt.</p>
+  <p>Die Decision Curve Analysis (deutsch gelegentlich Entscheidungskurvenanalyse) von Andrew Vickers und Elena Elkin schließt genau diese Lücke.</p>
+
+  <h2>Die Idee in einem Satz</h2>
+  <p>Man legt fest, ab welcher geschätzten Wahrscheinlichkeit man handeln würde, und diese Schwelle <strong>ist</strong> das Kostenverhältnis.</p>
+  <p>Wenn ich eine Anlage vorbeugend warte, sobald ihr Ausfallrisiko fünf Prozent übersteigt, dann sage ich damit implizit: Ein Ausfall kostet mich neunzehnmal so viel wie eine unnötige Wartung. Denn genau bei diesem Verhältnis wäre ich zwischen beiden Optionen indifferent.</p>
+
+  <table>
+    <tr><th>Schwelle p_t</th><th>0,03</th><th>0,05</th><th>0,10</th><th>0,20</th></tr>
+    <tr><td>Ausfall kostet das …-fache einer Wartung</td><td>32,3</td><td>19,0</td><td>9,0</td><td>4,0</td></tr>
+  </table>
+
+  <p>Der Net Benefit rechnet mit diesem Wechselkurs:</p>
+
+  <div class="formel">NB(p_t) = TP/n &minus; (FP/n) × p_t/(1 &minus; p_t)</div>
+
+  <p>Er zählt richtig gefundene Fälle je Beobachtung, abzüglich der Fehlalarme zu ihrem Kostengewicht. Und weil eine Zahl ohne Vergleich nichts wert ist, kommen zwei Referenzstrategien dazu, die kein Modell brauchen: <strong>alle behandeln</strong> und <strong>keinen behandeln</strong>. Nützlich ist ein Modell dort, wo es über beiden Referenzstrategien liegt, und die Frage ist, ob das im ganzen Bereich plausibler Schwellen gilt.</p>
+
+  <h2>Der Code</h2>
+  <p>4.000 Anlagen, drei Merkmale, ein logistisches Risikomodell. Ausfälle sind selten (Prävalenz 0,136), was dem Normalfall im Betrieb entspricht. Das Modell wird auf der einen Hälfte geschätzt und auf der anderen ausgewertet; ohne diese Trennung misst man das Rauschen mit.</p>
+
+  <div class="filelabel">dca_wartung.R</div>
+<pre><span class="fn">library</span>(dplyr)
+<span class="fn">library</span>(tidyr)
+<span class="fn">set.seed</span>(2026)
+
+N &lt;- 4000
+dat &lt;- <span class="fn">tibble</span>(x1 = <span class="fn">rnorm</span>(N), x2 = <span class="fn">rnorm</span>(N), x3 = <span class="fn">rbinom</span>(N, 1, 0.35)) |&gt;
+  <span class="fn">mutate</span>(p_wahr = <span class="fn">plogis</span>(-2.6 + 0.9 * x1 + 0.7 * x2 + 0.8 * x3),
+         y      = <span class="fn">rbinom</span>(N, 1, p_wahr))
+
+idx   &lt;- <span class="fn">sample</span>(<span class="fn">seq_len</span>(N), N / 2)
+train &lt;- dat |&gt; <span class="fn">slice</span>(idx)
+test  &lt;- dat |&gt; <span class="fn">slice</span>(-idx)
+
+fit_A &lt;- <span class="fn">glm</span>(y ~ x1 + x2 + x3, data = train, family = <span class="fn">binomial</span>)</pre>
+
+  <p>Und jetzt der Vergleichsfall. <strong>Modell B ist Modell A mit anderen Wahrscheinlichkeiten, aber derselben Rangfolge:</strong></p>
+
+<pre>test &lt;- test |&gt;
+  <span class="fn">mutate</span>(pA = <span class="fn">predict</span>(fit_A, newdata = test, type = <span style="color:#c98">"response"</span>),
+         pB = <span class="fn">plogis</span>(1.9 * <span class="fn">qlogis</span>(pA) + 1.4))   <span class="cmt"># streng monoton, systematisch zu hoch</span></pre>
+
+  <p>Das ist bewusst konstruiert, und zwar um einen Punkt zu isolieren, der sich sonst schwer erzählen lässt: <strong>Die AUC ist gegen streng monotone Transformationen invariant.</strong> Sie sieht nur die Reihenfolge. Der Net Benefit sieht die Wahrscheinlichkeit, und die vergleicht er mit der Schwelle.</p>
+  <p>Die Kurve selbst ist ein <code>group_by</code> über die Schwellen:</p>
+
+<pre>kurve &lt;- <span class="fn">crossing</span>(pt = <span class="fn">seq</span>(0.01, 0.40, by = 0.005),
+                  test |&gt; <span class="fn">select</span>(y, pA, pB)) |&gt;
+  <span class="fn">group_by</span>(pt) |&gt;
+  <span class="fn">summarise</span>(
+    nb_A   = <span class="fn">mean</span>(pA &gt;= pt &amp; y == 1) - <span class="fn">mean</span>(pA &gt;= pt &amp; y == 0) * (pt / (1 - pt)),
+    nb_B   = <span class="fn">mean</span>(pB &gt;= pt &amp; y == 1) - <span class="fn">mean</span>(pB &gt;= pt &amp; y == 0) * (pt / (1 - pt)),
+    nb_all = <span class="fn">mean</span>(y == 1)            - <span class="fn">mean</span>(y == 0)            * (pt / (1 - pt)),
+    .groups = <span style="color:#c98">"drop"</span>)          <span class="cmt"># nb_all = "alle warten", "keinen warten" ist 0</span></pre>
+
+  <p>Für den produktiven Einsatz gibt es <code>dcurves</code> (Sjoberg, MSKCC, Version 0.5.1 vom November 2025); das Paket deckt laut Dokumentation auch zensierte Daten, Case-Control-Designs und die Overfit-Korrektur ab. Für das Verständnis ist die Handrechnung besser: Man sieht, wo das Kostenverhältnis einsteigt.</p>
+  <p>AUC und Kalibrierung sind ebenfalls fünf Zeilen. Die Kalibrierungs-Steigung ist der Koeffizient auf den Logit der Vorhersage; bei einem gut kalibrierten Modell liegt sie bei 1:</p>
+
+<pre>guete &lt;- <span class="fn">function</span>(daten, score) {
+  daten |&gt;
+    <span class="fn">summarise</span>(
+      n1  = <span class="fn">sum</span>(y == 1),
+      n0  = <span class="fn">sum</span>(y == 0),
+      auc = (<span class="fn">sum</span>(<span class="fn">rank</span>({{ score }})[y == 1]) - n1 * (n1 + 1) / 2) / (n1 * n0),
+      steigung = <span class="fn">coef</span>(<span class="fn">glm</span>(y ~ <span class="fn">qlogis</span>({{ score }}), family = <span class="fn">binomial</span>))[2])
+}
+
+test |&gt; <span class="fn">guete</span>(pA)
+test |&gt; <span class="fn">guete</span>(pB)</pre>
+
+  <h2>Das Ergebnis</h2>
+  <p>Ein einzelner Split trägt keine Aussage. Alle folgenden Zahlen stammen aus <strong>200 Läufen mit je neu gezogenem Datensatz und neuem Split</strong>, sofern nicht anders vermerkt.</p>
+
+  <p><strong>Erstens, die AUC.</strong></p>
+  <table>
+    <tr><th></th><th>Mittel</th><th>sd</th></tr>
+    <tr><td>AUC Modell A</td><td>0,7854</td><td>0,0145</td></tr>
+    <tr><td>AUC Modell B</td><td>0,7854</td><td>0,0145</td></tr>
+  </table>
+  <p>Die maximale absolute Differenz über alle 200 Läufe: <strong>0,00e+00.</strong> Nicht klein, sondern null. Nach der meistberichteten Prüfgröße für Vorhersagemodelle sind diese beiden Modelle identisch.</p>
+
+  <p><strong>Zweitens, die Kalibrierung</strong> (aus dem ersten Lauf, weil die Kennzahlen je Lauf kaum variieren):</p>
+  <table>
+    <tr><th></th><th>mittlere Vorhersage</th><th>beobachtet</th><th>Kalibrierungs-Steigung</th></tr>
+    <tr><td>Modell A</td><td>0,1379</td><td>0,1310</td><td>0,962</td></tr>
+    <tr><td>Modell B</td><td>0,1535</td><td>0,1310</td><td>0,506</td></tr>
+  </table>
+
+  <p><strong>Drittens, der Net Benefit.</strong> Mittel über 200 Läufe:</p>
+  <table>
+    <tr><th>p_t</th><th>alle warten</th><th>Modell A</th><th>Modell B</th><th>Differenz A &minus; B</th></tr>
+    <tr><td>0,03</td><td>0,10749</td><td>0,10945</td><td>0,10433</td><td>0,00512 (4,7 % von A)</td></tr>
+    <tr><td>0,05</td><td>0,08870</td><td>0,09582</td><td>0,09158</td><td>0,00424 (4,4 %)</td></tr>
+    <tr><td>0,10</td><td>0,03807</td><td>0,06988</td><td>0,06854</td><td>0,00134 (1,9 %)</td></tr>
+    <tr><td>0,15</td><td>&minus;0,01851</td><td>0,05188</td><td>0,05169</td><td>0,00019 (0,4 %)</td></tr>
+    <tr><td>0,20</td><td>&minus;0,08217</td><td>0,03855</td><td>0,03838</td><td>0,00018 (0,5 %)</td></tr>
+    <tr><td>0,30</td><td>&minus;0,23676</td><td>0,02145</td><td>0,01800</td><td>0,00346 (16,1 %)</td></tr>
+  </table>
+
+  <p>Net-Benefit-Werte sind schwer zu lesen. Dieselbe Rechnung in einer Einheit, die im Gespräch trägt, sind <strong>vermiedene unnötige Wartungen je 1000 Anlagen gegenüber „alle warten", bei gleicher Zahl gefundener Ausfälle</strong>, mit dem 5. bis 95. Perzentil über die 200 Läufe:</p>
+
+  <table>
+    <tr><th>p_t</th><th>Kostenfaktor</th><th>Modell A</th><th>Modell B</th></tr>
+    <tr><td><strong>0,03</strong></td><td>32,3</td><td><strong>+63,5</strong> [&minus;12,0; +125,0]</td><td><strong>&minus;102,0</strong> [&minus;272,8; +53,1]</td></tr>
+    <tr><td>0,05</td><td>19,0</td><td>+135,2 [+66,9; +200,8]</td><td>+54,6 [&minus;50,6; +157,2]</td></tr>
+    <tr><td>0,10</td><td>9,0</td><td>+286,2 [+233,0; +340,2]</td><td>+274,2 [+210,8; +343,1]</td></tr>
+    <tr><td>0,20</td><td>4,0</td><td>+482,9 [+438,8; +526,6]</td><td>+482,2 [+439,8; +524,2]</td></tr>
+  </table>
+
+  <figure>
+  <svg viewBox="0 0 700 340" xmlns="http://www.w3.org/2000/svg" role="img" style="width:100%;display:block;background:#191919;border:1px solid #2a2a2a;border-radius:8px">
+<title>Vermiedene unnötige Wartungen je 1000 Anlagen über der Schwellenwahrscheinlichkeit, Modell A gegen Modell B</title>
+<text x="24" y="28" fill="#767676" font-family="ui-monospace,Consolas,monospace" font-size="12">vermiedene unnoetige wartungen je 1000 anlagen (gegenueber "alle warten")</text>
+<line x1="90" y1="88.8" x2="660" y2="88.8" stroke="#2a2a2a" stroke-width="1"/>
+<text x="82" y="92.8" fill="#5A5A5A" font-family="ui-monospace,Consolas,monospace" font-size="10" text-anchor="end">+400</text>
+<line x1="90" y1="140.6" x2="660" y2="140.6" stroke="#2a2a2a" stroke-width="1"/>
+<text x="82" y="144.6" fill="#5A5A5A" font-family="ui-monospace,Consolas,monospace" font-size="10" text-anchor="end">+200</text>
+<line x1="90" y1="244.1" x2="660" y2="244.1" stroke="#2a2a2a" stroke-width="1"/>
+<text x="82" y="248.1" fill="#5A5A5A" font-family="ui-monospace,Consolas,monospace" font-size="10" text-anchor="end">&#8722;200</text>
+<polygon points="90,160.0 157.1,140.4 324.7,104.3 660,56.1 660,78.8 324.7,132.1 157.1,175.0 90,195.5" fill="#5BD61E" opacity="0.16"/>
+<polygon points="90,178.6 157.1,151.7 324.7,103.6 660,56.7 660,78.5 324.7,137.8 157.1,205.5 90,263.0" fill="#9a9a9a" opacity="0.14"/>
+<line x1="90" y1="192.4" x2="660" y2="192.4" stroke="#C9C9C9" stroke-width="1.2" stroke-dasharray="5 4"/>
+<text x="96" y="186.4" fill="#C9C9C9" font-family="ui-monospace,Consolas,monospace" font-size="10">null-linie: "alle warten"</text>
+<polyline points="90,218.8 157.1,178.2 324.7,121.4 660,67.6" fill="none" stroke="#9a9a9a" stroke-width="2.2"/>
+<polyline points="90,175.9 157.1,157.4 324.7,118.3 660,67.4" fill="none" stroke="#5BD61E" stroke-width="2.6"/>
+<circle cx="90" cy="175.9" r="4" fill="#5BD61E"/><circle cx="157.1" cy="157.4" r="4" fill="#5BD61E"/>
+<circle cx="324.7" cy="118.3" r="4" fill="#5BD61E"/><circle cx="660" cy="67.4" r="4" fill="#5BD61E"/>
+<circle cx="90" cy="218.8" r="4" fill="#9a9a9a"/><circle cx="157.1" cy="178.2" r="4" fill="#9a9a9a"/>
+<circle cx="324.7" cy="121.4" r="4" fill="#9a9a9a"/><circle cx="660" cy="67.6" r="4" fill="#9a9a9a"/>
+<text x="112" y="171" fill="#5BD61E" font-family="ui-monospace,Consolas,monospace" font-size="11">+63,5</text>
+<text x="112" y="232" fill="#9a9a9a" font-family="ui-monospace,Consolas,monospace" font-size="11">&#8722;102,0</text>
+<line x1="90" y1="278" x2="660" y2="278" stroke="#2a2a2a" stroke-width="1"/>
+<text x="90" y="296" fill="#C9C9C9" font-family="ui-monospace,Consolas,monospace" font-size="11" text-anchor="middle">0.03</text>
+<text x="157.1" y="296" fill="#C9C9C9" font-family="ui-monospace,Consolas,monospace" font-size="11" text-anchor="middle">0.05</text>
+<text x="324.7" y="296" fill="#C9C9C9" font-family="ui-monospace,Consolas,monospace" font-size="11" text-anchor="middle">0.10</text>
+<text x="660" y="296" fill="#C9C9C9" font-family="ui-monospace,Consolas,monospace" font-size="11" text-anchor="middle">0.20</text>
+<text x="375" y="314" fill="#767676" font-family="ui-monospace,Consolas,monospace" font-size="11" text-anchor="middle">schwellenwahrscheinlichkeit p_t</text>
+<rect x="90" y="326" width="12" height="10" fill="#5BD61E"/><text x="108" y="335" fill="#767676" font-family="ui-monospace,Consolas,monospace" font-size="11">modell a (kalibriert, steigung 0.96)</text>
+<rect x="380" y="326" width="12" height="10" fill="#9a9a9a"/><text x="398" y="335" fill="#767676" font-family="ui-monospace,Consolas,monospace" font-size="11">modell b (fehlkalibriert, steigung 0.51)</text>
+</svg>
+  <figcaption>Beide Modelle haben dieselbe AUC. Links, bei niedriger Schwelle, fällt Modell B unter die Null-Linie: Dort ist es schlechter, als alle Anlagen zu warten. Bänder sind das 5. bis 95. Perzentil über 200 Läufe.</figcaption>
+  </figure>
+
+  <p>Die Perzentile bei p_t&nbsp;=&nbsp;0,03 überschreiten in beiden Fällen die Null. Die Aussage steht deshalb besser als Häufigkeit: <strong>In wie vielen der 200 Läufe ist die Strategie schlechter als „alle warten"?</strong></p>
+
+  <table>
+    <tr><th>p_t</th><th>Modell A</th><th>Modell B</th></tr>
+    <tr><td><strong>0,03</strong></td><td><strong>9 %</strong></td><td><strong>85 %</strong></td></tr>
+    <tr><td>0,05</td><td>0 %</td><td>21 %</td></tr>
+    <tr><td>0,10</td><td>0 %</td><td>0 %</td></tr>
+    <tr><td>0,20</td><td>0 %</td><td>0 %</td></tr>
+  </table>
+
+  <p>Das ist der Befund. Bei p_t&nbsp;=&nbsp;0,20, wenn ein Ausfall das Vierfache einer Wartung kostet, sind die beiden Modelle nicht zu unterscheiden. Bei p_t&nbsp;=&nbsp;0,03, wenn ein Ausfall das 32-fache kostet, spart Modell A im Mittel 64 unnötige Wartungen je 1000 Anlagen, während Modell B in 85 von 100 Läufen schlechter abschneidet, als hätte man einfach alle gewartet. Bei identischer AUC.</p>
+
+  <p><strong>Wo die Fehlkalibrierung weh tut.</strong> Der Unterschied ist bei niedrigen Schwellen groß (4,7 Prozent des Net Benefit bei p_t&nbsp;=&nbsp;0,03), schrumpft im mittleren Bereich auf unter ein halbes Prozent (p_t&nbsp;=&nbsp;0,15 und 0,20) und wächst bei hohen Schwellen relativ wieder an, auf 16 Prozent bei p_t&nbsp;=&nbsp;0,30. Das Letzte ist allerdings ein Anteil an einem kleinen Nenner: Dort liegt der absolute Nutzen beider Modelle nur noch bei rund einem Fünftel des Werts bei p_t&nbsp;=&nbsp;0,05. Praktisch relevant ist der Bereich links: <strong>Wenn ein übersehener Fall teuer ist, entscheidet die Kalibrierung mit.</strong></p>
+
+  <h2>So nutze ich das produktiv</h2>
+  <p><strong>Die Schwelle wird vorher festgelegt und nicht nachher abgelesen.</strong> Vickers nennt das in seinen „Seven Common Errors in Decision Curve Analysis" (2023) als Fehler 5, und es ist der Fehler, der am häufigsten passiert: Man rechnet die Kurve, sucht den Bereich, in dem das eigene Modell gut aussieht, und erklärt ihn zum relevanten. Der Bereich kommt aus dem Fachgespräch, also aus der Frage, was ein Ausfall kostet und was eine Wartung, und nicht aus der Grafik. Ein Nebeneffekt macht die Sache erst nützlich: <strong>Die Frage nach dem Kostenverhältnis führt ein Gespräch, das ohne sie nicht stattfindet.</strong> In der Praxis kennt der Fachbereich das Verhältnis oft nicht genau, kann aber eine Spanne nennen, und eine Spanne reicht.</p>
+  <p><strong>Der Schwellenbereich bleibt eng.</strong> Fehler 2 auf derselben Liste. Eine Kurve von 0 bis 1 sieht gründlich aus, ist aber Unsinn: Niemand wartet eine Anlage erst bei 80 Prozent Ausfallrisiko vorbeugend. Eingezeichnet wird der Bereich, in dem jemand tatsächlich entscheiden würde.</p>
+  <p><strong>Kalibrierung wird mitgeprüft und nicht vorausgesetzt.</strong> Das Beispiel oben ist konstruiert, das Muster dahinter ist es nicht: Modelle werden auf einer Population geschätzt und auf einer anderen eingesetzt, Prävalenzen verschieben sich, und die Rangfolge bleibt dabei oft brauchbar, während die Wahrscheinlichkeiten wegdriften. Van Calster und Kollegen nennen die Kalibrierung deshalb die Achillesferse der Predictive Analytics. In einer produktiven Pipeline gehören Kalibrierungs-Intercept und -Steigung neben die AUC ins Monitoring, und wenn die Steigung wegläuft, ist der Net Benefit die Größe, die sagt, ob es jemanden stört.</p>
+  <p><strong>Die Unsicherheit gehört dazu, auch wenn das Feld uneins ist, wie.</strong> Vickers und Kollegen argumentieren 2023, dass Signifikanztests für den Net Benefit schädlich wären: Wer entscheiden muss, wählt den höheren Erwartungsnutzen, unabhängig vom p-Wert. Ein Gegenstrang der Literatur drückt die Unsicherheit stattdessen als Wert weiterer Information aus (EVPI, EVSI), ein bayesianischer Weg existiert ebenfalls (<code>bayesdca</code>, bislang nur auf GitHub).</p>
+  <p>Ich habe oben deshalb keine Konfidenzintervalle gezeichnet, sondern das 5. bis 95. Perzentil über 200 Läufe berichtet, dazu die Häufigkeit, mit der eine Strategie schlechter abschneidet als „alle warten". Zwei Hinweise zur Einordnung: Jeder Lauf zieht einen neuen Datensatz <em>und</em> teilt ihn neu, die Streuung enthält also beides. Und sie ersetzt keine Inferenz. Sie zeigt, wie stabil die Aussage über wiederholte Stichproben desselben Prozesses ist, nicht mehr.</p>
+
+  <div class="callout">
+    <div class="t">WAS DAS FÜR DIE PIPELINE HEISST</div>
+    <p style="margin:0">Der Schwellenbereich, die Kalibrierungs-Steigung und der Net Benefit an den vereinbarten Schwellen gehören in dasselbe Monitoring wie die AUC (<a href="/#leistungen">automatisiertes Reporting und reproduzierbare Pipelines</a>). Ein Modell, dessen Steigung von 0,96 auf 0,50 wandert, sieht in der AUC unverändert aus und kann trotzdem an der Stelle, an der entschieden wird, seinen Nutzen verloren haben.</p>
+  </div>
+
+  <h2>Fazit</h2>
+  <p>Die AUC beantwortet die Frage „sortiert mein Modell richtig?". Die Frage im Raum lautet meistens „wird die Entscheidung besser?". Das sind zwei Fragen, und die zweite braucht eine Größe, in der das Kostenverhältnis vorkommt. Der Net Benefit ist diese Größe. Er kostet ein paar Zeilen Code und ein Gespräch mit dem Fachbereich, das ohnehin fällig ist.</p>
+  <p>Das Verfahren ist dabei domänenneutral und passt auf jede Ja-Nein-Entscheidung mit asymmetrischen Kosten. Die Literatur dazu ist trotzdem fast vollständig medizinisch: Eine Suche nach peer-reviewten, methodisch eigenständigen Anwendungen in Instandhaltung, Risikosteuerung oder Ressourcenplanung bleibt leer. Was es außerhalb der Medizin gibt, ist die benachbarte Tradition des <em>cost-sensitive learning</em> mit Kostenmatrizen: dieselbe Grundidee, andere Sprache, andere Fachgemeinschaft, aber ohne Entscheidungskurve und ohne die Referenzstrategien „alle" und „keinen", die den Vergleich erst interpretierbar machen.</p>
+
+  <h2>Drei Anlässe, bei denen sich das lohnt</h2>
+  <ul>
+    <li>Ein Modell ist fertig und die Frage „ab welchem Wert handeln wir?" steht im Raum.</li>
+    <li>Zwei Modelle liegen bei der AUC gleichauf und die Entscheidung droht am Bauchgefühl zu hängen.</li>
+    <li>Ein produktives Modell läuft seit Monaten, und niemand hat geprüft, ob seine Wahrscheinlichkeiten noch stimmen.</li>
+  </ul>
+
+  <div class="callout">
+    <div class="eyebrow">AUS DERSELBEN REIHE</div>
+    <p><a href="/insights/conformal-prediction-xgboost.html">Vorhersageintervalle für XGBoost-Prognosen: Conformal Prediction in R</a>. Wie sich Prognoseunsicherheit mit nachprüfbarer Überdeckung ausweisen lässt.</p>
+    <p style="margin-bottom:0"><a href="/insights/funnel-plots-kennzahlenberichte.html">Kennzahlenberichte in R automatisieren: Funnel Plots statt fester Schwellenwerte</a>. Warum ein fester Referenzwert die Fallzahl misst und nicht die Leistung.</p>
+  </div>
+
+  <div class="cta">
+    <div style="font:600 12px ui-monospace,Consolas,monospace;letter-spacing:.1em;color:#5BD61E;margin-bottom:8px">ÄHNLICHE FRAGESTELLUNG?</div>
+    <p style="margin:0 0 4px">Ein Modell, aus dem eine Handlungsregel werden soll: Im 15-minütigen Erstgespräch kläre ich, welche Prüfgröße dazugehört und wie sie in den Betrieb kommt.</p>
+    <a href="https://cal.com/nico-schafer-xmc3xr/erstgesprach" target="_blank" rel="noopener">15-MIN-TERMIN BUCHEN →</a>
+    <p style="margin:10px 0 0;font-size:15px">Wie Prognosemodelle bei sove.it gebaut, geprüft und in Betrieb genommen werden: <a href="/#leistungen">Predictive Analytics und produktive R-Anwendungen</a>.</p>
+  </div>
+
+  <p class="note">Alle Zahlen stammen aus einem tatsächlich gelaufenen Beispiel mit simulierten Daten (4.000 Anlagen, drei Merkmale, Prävalenz 0,136, <code>set.seed(2026)</code>, 200 Wiederholungen mit je neuem Datensatz und neuem Split): keine Projektergebnisse und keine illustrativen Werte. Der Lauf erfolgte in einem Container mit R 4.1.2; CRAN war aus der Umgebung nicht erreichbar, <code>dcurves</code> ist deshalb nicht gegen die Handrechnung gelaufen. Die Angaben zum Paket beruhen auf seiner Dokumentation. Modell B ist eine streng monotone Transformation von Modell A und damit bewusst konstruiert; es zeigt, dass die AUC gegen Kalibrierung blind ist, und ist kein Modell, das jemand so bauen würde. Der Net Benefit, die AUC und die Kalibrierungs-Steigung sind der oben gezeigte Code.</p>
+
+  <h2>Quellen</h2>
+  <ul class="quellen">
+    <li>Vickers, A. J. &amp; Elkin, E. B. (2006): Decision Curve Analysis: A Novel Method for Evaluating Prediction Models. <em>Medical Decision Making</em> 26(6), 565–574.</li>
+    <li>Vickers, A. J., Van Calster, B. &amp; Steyerberg, E. W. (2016): Net benefit approaches to the evaluation of prediction models, molecular markers, and diagnostic tests. <em>BMJ</em> 352, i6.</li>
+    <li>Vickers, A. J., Van Calster, B. &amp; Steyerberg, E. W. (2019): A simple, step-by-step guide to interpreting decision curve analysis. <em>Diagnostic and Prognostic Research</em> 3, 18.</li>
+    <li>Vickers, A. J., Cronin, A. M., Elkin, E. B. &amp; Gonen, M. (2008): Extensions to decision curve analysis. <em>BMC Medical Informatics and Decision Making</em> 8, 53.</li>
+    <li>Vickers, A. J. (2023): Seven Common Errors in Decision Curve Analysis. Statistical Thinking (Blog von Frank Harrell), 18.03.2023.</li>
+    <li>Vickers, A. J., Van Calster, B., Wynants, L. &amp; Steyerberg, E. W. (2023): Decision curve analysis: confidence intervals and hypothesis testing for net benefit. <em>Diagnostic and Prognostic Research</em> 7, 11.</li>
+    <li>Cook, N. R. (2007): Use and Misuse of the Receiver Operating Characteristic Curve in Risk Prediction. <em>Circulation</em> 115(7), 928–935.</li>
+    <li>Steyerberg, E. W. et al. (2010): Assessing the Performance of Prediction Models. <em>Epidemiology</em> 21(1), 128–138.</li>
+    <li>Van Calster, B., McLernon, D. J., van Smeden, M., Wynants, L. &amp; Steyerberg, E. W. (2019): Calibration: the Achilles heel of predictive analytics. <em>BMC Medicine</em> 17, 230.</li>
+    <li>Talluri, R. &amp; Shete, S. (2016): Using the weighted area under the net benefit curve for decision curve analysis. <em>BMC Medical Informatics and Decision Making</em> 16, 94.</li>
+    <li>Netto Flores Cruz, G. &amp; Korthauer, K. (2024): Bayesian Decision Curve Analysis With bayesdca. <em>Statistics in Medicine</em> 43(30), 6042–6058.</li>
+    <li>Sadatsafavi, M., Lee, T. Y., Wynants, L., Vickers, A. J. &amp; Gustafson, P. (2022): Uncertainty and the Value of Information in Risk Prediction Modeling. <em>Medical Decision Making</em>, DOI 10.1177/0272989X221078789.</li>
+    <li>R-Pakete: <code>dcurves</code> 0.5.1 (Sjoberg) · <code>rmda</code> 1.6 (Brown) · <code>bayesdca</code> (GitHub)</li>
+  </ul>
+</article>
+
+<footer><div class="wrap">© 2026 sove.it e.K. · FROM DATA TO DECISIONS &nbsp;·&nbsp; Methoden-Notizen erscheinen monatlich.
+<div class="meta" style="margin:8px 0 0"><a href="/insights/feed.xml">Feed abonnieren</a></div></div></footer>
+<script data-goatcounter="https://sn1k.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>

@@ -92,7 +92,7 @@
     
       <div style="padding:30px 28px;background:#141414;transition:background .2s" data-hv="sv-hv2">
         <h3 style="margin:0;font:600 13px ui-monospace,Consolas,monospace;color:#fff;margin-bottom:8px"><span style="color:#5BD61E">01</span> PROGNOSE & PREDICTIVE</h3>
-        <div style="font:13px/1.55 Arial,sans-serif;color:#C9C9C9">GLM/GAM, Random Forest/XGBoost, Zeitreihen, Klassifikation und Scoring. Vorhersagen mit quantifizierter Unsicherheit statt einer Punktschätzung ohne Fehlerangabe.</div>
+        <div style="font:13px/1.55 Arial,sans-serif;color:#C9C9C9">GLM/GAM, Random Forest/XGBoost, Zeitreihen, Klassifikation und Scoring. Jede Vorhersage kommt mit Prognoseintervall und ausgewiesener Modellgüte.</div>
       </div>
     
       <div style="padding:30px 28px;background:#141414;transition:background .2s" data-hv="sv-hv2">
@@ -164,7 +164,7 @@ coxph(Surv(zeit, ereignis) ~ arm + alter, data = d)</div><div style="margin-top:
       <div style="color:#767676;margin-bottom:6px;border-bottom:1px solid #2a2a2a;padding-bottom:6px">wirkung.R</div>
       <div style="white-space:pre-line">matchit(treat ~ x1 + x2, data = d, method = "nearest")
 lm(y ~ treat * post, data = d)  # Diff-in-Diff</div><div style="margin-top:12px;font:11px ui-monospace,Consolas,monospace;color:#767676"><span style="color:#5A5A5A">Pakete:</span> MatchIt (PS-Matching) · base R (lm / Diff-in-Diff)</div>
-      <div style="margin-top:16px;font:13px/1.6 Arial,sans-serif;color:#C9C9C9">Propensity-Score-Matching, Differenz-von-Differenzen und Wirkungsstudien. Identifizierte Effekte mit ausgewiesener Annahme statt Korrelationsgeschichten.</div>
+      <div style="margin-top:16px;font:13px/1.6 Arial,sans-serif;color:#C9C9C9">Propensity-Score-Matching, Differenz-von-Differenzen und Wirkungsstudien. Identifizierte Effekte mit der Annahme, unter der sie gelten.</div>
       <div style="margin-top:10px;font:12px ui-monospace,Consolas,monospace;color:#767676">→ u. a. Programmevaluation Entwicklungszusammenarbeit</div>
     </div>
   </div>
@@ -211,7 +211,7 @@ predict(fit, newx = x_neu, type = "response")</div><div style="margin-top:12px;f
       <div style="white-space:pre-line">targets::tar_make()
 plumber::pr("api.R") |> plumber::pr_run()
 DBI::dbWriteTable(con, "mart_kpi", df)</div><div style="margin-top:12px;font:11px ui-monospace,Consolas,monospace;color:#767676"><span style="color:#5A5A5A">Pakete:</span> targets (Orchestrierung) · plumber (API) · DBI + duckdb · mongolite (Mongo) · pointblank (Validierung)</div>
-      <div style="margin-top:16px;font:13px/1.6 Arial,sans-serif;color:#C9C9C9">Reproduzierbare ETL-Strecken: Rohdaten aus SQL, APIs, Crawls und OCR werden validiert, transformiert und versioniert bereitgestellt, orchestriert statt handgeklöppelt.</div>
+      <div style="margin-top:16px;font:13px/1.6 Arial,sans-serif;color:#C9C9C9">Reproduzierbare ETL-Strecken: Rohdaten aus SQL, APIs, Crawls und OCR werden validiert, transformiert und versioniert bereitgestellt, orchestriert und auf Knopfdruck wiederholbar.</div>
       <div style="margin-top:10px;font:12px ui-monospace,Consolas,monospace;color:#767676">→ u. a. tägliche Sensor-Pipelines Instandhaltung</div>
     </div>
   </div>
@@ -476,7 +476,7 @@ uwot::umap(emb) |> dbscan::hdbscan(minPts = 25)</div><div style="margin-top:12px
     
       <div style="padding:30px 28px;background:#141414;transition:background .2s" data-hv="sv-hv2">
         <h3 style="margin:0;font:600 13px ui-monospace,Consolas,monospace;color:#fff;margin-bottom:8px"><span style="color:#5BD61E">01</span> FORECASTING & PREDICTIVE</h3>
-        <div style="font:13px/1.55 Arial,sans-serif;color:#C9C9C9">GLM/GAM, random forest/XGBoost, time series, classification & scoring — predictions with quantified uncertainty, not point guesses.</div>
+        <div style="font:13px/1.55 Arial,sans-serif;color:#C9C9C9">GLM/GAM, random forest/XGBoost, time series, classification &amp; scoring. Every prediction comes with a prediction interval and a stated measure of fit.</div>
       </div>
     
       <div style="padding:30px 28px;background:#141414;transition:background .2s" data-hv="sv-hv2">
@@ -548,7 +548,7 @@ coxph(Surv(zeit, ereignis) ~ arm + alter, data = d)</div><div style="margin-top:
       <div style="color:#767676;margin-bottom:6px;border-bottom:1px solid #2a2a2a;padding-bottom:6px">wirkung.R</div>
       <div style="white-space:pre-line">matchit(treat ~ x1 + x2, data = d, method = "nearest")
 lm(y ~ treat * post, data = d)  # Diff-in-Diff</div><div style="margin-top:12px;font:11px ui-monospace,Consolas,monospace;color:#767676"><span style="color:#5A5A5A">Packages:</span> MatchIt (PS matching) · base R (lm / diff-in-diff)</div>
-      <div style="margin-top:16px;font:13px/1.6 Arial,sans-serif;color:#C9C9C9">Propensity score matching, difference-in-differences and impact studies — cleanly identified effects instead of correlation stories.</div>
+      <div style="margin-top:16px;font:13px/1.6 Arial,sans-serif;color:#C9C9C9">Propensity score matching, difference-in-differences and impact studies. Identified effects, each with the assumption it rests on.</div>
       <div style="margin-top:10px;font:12px ui-monospace,Consolas,monospace;color:#767676">→ e.g. programme evaluation in development cooperation</div>
     </div>
   </div>
@@ -595,7 +595,7 @@ predict(fit, newx = x_neu, type = "response")</div><div style="margin-top:12px;f
       <div style="white-space:pre-line">targets::tar_make()
 plumber::pr("api.R") |> plumber::pr_run()
 DBI::dbWriteTable(con, "mart_kpi", df)</div><div style="margin-top:12px;font:11px ui-monospace,Consolas,monospace;color:#767676"><span style="color:#5A5A5A">Packages:</span> targets (orchestration) · plumber (API) · DBI + duckdb · mongolite (Mongo) · pointblank (validation)</div>
-      <div style="margin-top:16px;font:13px/1.6 Arial,sans-serif;color:#C9C9C9">Reproducible ETL: raw data from SQL, APIs, crawls and OCR is validated, transformed and served versioned — orchestrated, not hand-stitched.</div>
+      <div style="margin-top:16px;font:13px/1.6 Arial,sans-serif;color:#C9C9C9">Reproducible ETL: raw data from SQL, APIs, crawls and OCR is validated, transformed and served versioned, orchestrated and repeatable at the push of a button.</div>
       <div style="margin-top:10px;font:12px ui-monospace,Consolas,monospace;color:#767676">→ e.g. daily sensor pipelines in maintenance</div>
     </div>
   </div>

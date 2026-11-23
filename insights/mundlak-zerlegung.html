@@ -117,6 +117,7 @@
 
   <div class="filelabel">mundlak.R</div>
 <pre><span class="fn">library</span>(dplyr)
+<span class="cmt"># d: Panel strecke_id × jahr, erzeugt im Skript mundlak-zerlegung.R</span>
 
 <span class="cmt"># Einheiten-Mittelwert der zeitveränderlichen Kovariate</span>
 d &lt;- d |&gt; <span class="fn">group_by</span>(strecke_id) |&gt;
@@ -174,7 +175,8 @@ m_hyb &lt;- <span class="fn">plm</span>(stoerungen ~ instand_dev + instand_bar,
 <pre><span class="fn">library</span>(glmmTMB)
 mc &lt;- <span class="fn">glmmTMB</span>(stoerungen ~ instandhaltung + instand_bar +
                 <span class="fn">offset</span>(<span class="fn">log</span>(laenge_km)) + (1 | strecke_id),
-              family = <span class="fn">nbinom2</span>, data = d)   <span class="cmt"># Overdispersion abgedeckt</span></pre>
+              family = <span class="fn">nbinom2</span>, data = dz)  <span class="cmt"># Overdispersion abgedeckt</span>
+<span class="cmt"># dz: Zähldaten-Panel mit laenge_km und instand_bar, erzeugt im Skript</span></pre>
 
   <p><code>laenge_km</code> ist die Länge des Streckenabschnitts. Der Offset darauf gehört dazu, weil Störungen eine Zählung sind, die mit der Länge des Abschnitts mitwächst: Ohne ihn schätzt das Modell Störungen je Abschnitt statt Störungen je Kilometer. Ob er die Koeffizienten tatsächlich verschiebt, hängt davon ab, ob die Länge mit der Instandhaltungsintensität zusammenhängt. Im hier gerechneten Beispiel ist sie unabhängig gezogen. In echten Netzdaten ist das selten so. Zu beachten ist außerdem, dass ein Offset einen Koeffizienten von exakt 1 unterstellt; wer das nicht voraussetzen will, nimmt <code>log(laenge_km)</code> als Kovariate auf und testet gegen 1. Im gerechneten Beispiel liegt der Within-Koeffizient bei &minus;0,135 (SE 0,052), der Koeffizient auf <code>instand_bar</code> bei +0,328. Der Between-Effekt ist die Summe beider Werte und liegt damit bei +0,193, auf der Log-Rate-Skala. Die Trennung ist dieselbe wie im linearen Fall: innerhalb der Strecke sinkende, zwischen den Strecken steigende Störungsraten.</p>
 

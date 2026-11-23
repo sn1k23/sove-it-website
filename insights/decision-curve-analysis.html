@@ -168,9 +168,9 @@ fit_A &lt;- <span class="fn">glm</span>(y ~ x1 + x2 + x3, data = train, family =
                   test |&gt; <span class="fn">select</span>(y, pA, pB)) |&gt;
   <span class="fn">group_by</span>(pt) |&gt;
   <span class="fn">summarise</span>(
-    nb_A   = <span class="fn">mean</span>(pA &gt;= pt &amp; y == 1) - <span class="fn">mean</span>(pA &gt;= pt &amp; y == 0) * (pt / (1 - pt)),
-    nb_B   = <span class="fn">mean</span>(pB &gt;= pt &amp; y == 1) - <span class="fn">mean</span>(pB &gt;= pt &amp; y == 0) * (pt / (1 - pt)),
-    nb_all = <span class="fn">mean</span>(y == 1)            - <span class="fn">mean</span>(y == 0)            * (pt / (1 - pt)),
+    nb_A   = <span class="fn">mean</span>(pA &gt;= pt &amp; y == 1) - <span class="fn">mean</span>(pA &gt;= pt &amp; y == 0) * (<span class="fn">first</span>(pt) / (1 - <span class="fn">first</span>(pt))),
+    nb_B   = <span class="fn">mean</span>(pB &gt;= pt &amp; y == 1) - <span class="fn">mean</span>(pB &gt;= pt &amp; y == 0) * (<span class="fn">first</span>(pt) / (1 - <span class="fn">first</span>(pt))),
+    nb_all = <span class="fn">mean</span>(y == 1)            - <span class="fn">mean</span>(y == 0)            * (<span class="fn">first</span>(pt) / (1 - <span class="fn">first</span>(pt))),
     .groups = <span style="color:#c98">"drop"</span>)          <span class="cmt"># nb_all = "alle warten", "keinen warten" ist 0</span></pre>
 
   <p>Für den produktiven Einsatz gibt es <code>dcurves</code> (Sjoberg, MSKCC, Version 0.5.1 vom November 2025); das Paket deckt laut Dokumentation auch zensierte Daten, Case-Control-Designs und die Overfit-Korrektur ab. Für das Verständnis ist die Handrechnung besser: Man sieht, wo das Kostenverhältnis einsteigt.</p>
